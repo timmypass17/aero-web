@@ -20,6 +20,7 @@ type Coordinate = [number, number];
 function MapPage() {
     const uploadedRouteId = "uploadedRouteId";
     const nearbyRouteId = "nearbyRouteId";
+    const defaultSelectedColor = "#e66465";
 
     const mapContainer = useRef<HTMLDivElement>(null);
     const mapRef = useRef<Map | null>(null);
@@ -31,8 +32,7 @@ function MapPage() {
     const uploadedStartMarkerRef = useRef<Marker | null>(null);
     const nearbyStartMarkersRef = useRef<Marker[]>([]);
 
-    const [selectedRouteColor, setSelectedRouteColor] =
-        useState("#e66465");
+    const [selectedRouteColor, setSelectedRouteColor] = useState(defaultSelectedColor);
 
     // Create a custom start marker
     function createStartMarkerElement(color: string) {
@@ -214,9 +214,46 @@ function MapPage() {
                 return;
             }
 
+            // Get the newly created route from the backend
+            const uploadedRoute = (await response.json()) as CyclingRoute;
+
             console.log(
-                "GPX uploaded successfully"
+                "GPX uploaded successfully:",
+                uploadedRoute
             );
+
+            // Add uploaded route to nearby routes locally
+            setNearbyRoutes((currentRoutes) => [
+                ...currentRoutes,
+                uploadedRoute,
+            ]);
+
+            // Clear previous uploaded route
+            routeCoordinatesRef.current = [];
+
+            const routeSource =
+                mapRef.current?.getSource(
+                    uploadedRouteId
+                ) as GeoJSONSource | undefined;
+
+            if (routeSource) {
+                routeSource.setData({
+                    type: "Feature",
+                    properties: {},
+                    geometry: {
+                        type: "LineString",
+                        coordinates: [],
+                    },
+                });
+            }
+
+            if (uploadedStartMarkerRef.current) {
+                uploadedStartMarkerRef.current.remove();
+                uploadedStartMarkerRef.current = null;
+            }
+
+            setGpxFile(null);
+            setSelectedRouteColor(defaultSelectedColor);
         } catch (error) {
             console.error(
                 "Error uploading GPX:",

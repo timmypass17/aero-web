@@ -26,17 +26,17 @@ public class CyclingRouteController {
     // - In Spring, form data is read using @RequestParam or @ModelAttribute. @RequestBody is for text format like JSON/XML.
     // Spring Security sees the session cookie and automatically creates/populates Authentication
     @PostMapping
-    public ResponseEntity<Void> saveRoute(
+    public ResponseEntity<CyclingRoute> saveRoute(
             @ModelAttribute CyclingRouteRequest request,
             Authentication authentication
     ) throws IOException {
-        cyclingRouteService.saveRoute(
+        CyclingRoute savedRoute = cyclingRouteService.saveRoute(
                 request.getFile(),
                 request.getName(),
                 authentication.getName(),
                 request.getColor()
         );
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(savedRoute);
     }
 
     @GetMapping
