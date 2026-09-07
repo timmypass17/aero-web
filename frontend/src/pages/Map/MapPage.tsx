@@ -1,6 +1,7 @@
-import { useEffect, useRef, useState } from "react";
+import {useEffect, useRef, useState} from "react";
 import {
     Map,
+    Marker,
     NavigationControl,
     setWorkerUrl,
     GeoJSONSource,
@@ -10,26 +11,63 @@ import workerUrl from "maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url";
 import "maplibre-gl/dist/maplibre-gl.css";
 import GPXUpload from "../../components/GPXUpload/GPXUpload.tsx";
 import "./MapPage.css";
+import type {CyclingRoute} from "../../types/CyclingRoute.ts";
 
 setWorkerUrl(workerUrl);
 
+type Coordinate = [number, number];
+
 function MapPage() {
+    const uploadedRouteId = "uploadedRouteId";
+    const nearbyRouteId = "nearbyRouteId";
+
     const mapContainer = useRef<HTMLDivElement>(null);
     const mapRef = useRef<Map | null>(null);
 
     const [gpxFile, setGpxFile] = useState<File | null>(null);
+    const [nearbyRoutes, setNearbyRoutes] = useState<CyclingRoute[]>([]);
 
+    const routeCoordinatesRef = useRef<Coordinate[]>([]);
+    const uploadedStartMarkerRef = useRef<Marker | null>(null);
+    const nearbyStartMarkersRef = useRef<Marker[]>([]);
+
+    const [selectedRouteColor, setSelectedRouteColor] =
+        useState("#e66465");
+
+    // Create a custom start marker
+    function createStartMarkerElement(color: string) {
+        const element = document.createElement("div");
+
+        element.style.width = "20px";
+        element.style.height = "20px";
+        element.style.backgroundColor = color;
+        element.style.border = "3px solid white";
+        element.style.borderRadius = "50%";
+        element.style.boxSizing = "border-box";
+        element.style.boxShadow = "0 1px 4px rgba(0, 0, 0, 0.4)";
+
+        return element;
+    }
+
+    // Parse coordinates from .gpx file and update map to show route
     function handleGpxFile(file: File | null) {
         setGpxFile(file);
 
-        if (file == null) {
-            // Remove the route from the map
-            const map = mapRef.current;
+        const map = mapRef.current;
 
-            if (map && map.getSource("route")) {
-                const source = map.getSource("route") as GeoJSONSource;
+        if (!map) {
+            console.error("Map is not ready");
+            return;
+        }
 
-                source.setData({
+        // If file is null, clear uploaded route
+        if (file === null) {
+            routeCoordinatesRef.current = [];
+
+            const routeSource = map.getSource(uploadedRouteId) as GeoJSONSource;
+
+            if (routeSource) {
+                routeSource.setData({
                     type: "Feature",
                     properties: {},
                     geometry: {
@@ -39,24 +77,30 @@ function MapPage() {
                 });
             }
 
+            // Remove uploaded route start marker
+            if (uploadedStartMarkerRef.current) {
+                uploadedStartMarkerRef.current.remove();
+                uploadedStartMarkerRef.current = null;
+            }
+
             return;
         }
 
-        // Read the GPX file
         const reader = new FileReader();
 
-        // When reader is finished reading, call onload
         reader.onload = () => {
             const gpxText = reader.result as string;
 
-            // Parse GPX XML
             const parser = new DOMParser();
-            const gpx = parser.parseFromString(gpxText, "application/xml");
 
-            // Get all track points
+            const gpx = parser.parseFromString(
+                gpxText,
+                "application/xml"
+            );
+
             const trackPoints = gpx.getElementsByTagName("trkpt");
 
-            const coordinates: [number, number][] = [];
+            const coordinates: Coordinate[] = [];
 
             for (let i = 0; i < trackPoints.length; i++) {
                 const point = trackPoints[i];
@@ -77,78 +121,258 @@ function MapPage() {
                 return;
             }
 
-            console.log("GPX coordinates:", coordinates);
+            console.log(
+                "GPX coordinates:",
+                coordinates
+            );
 
-            // Update the map
-            const map = mapRef.current;
+            routeCoordinatesRef.current = coordinates;
 
-            if (!map) {
-                console.error("Map is not ready");
+            const routeSource = map.getSource(uploadedRouteId) as GeoJSONSource;
+
+            if (!routeSource) {
+                console.error("Route source does not exist");
                 return;
             }
 
-            const source = map.getSource("route") as GeoJSONSource;
-
-            source.setData({
+            // Update uploaded route
+            routeSource.setData({
                 type: "Feature",
                 properties: {},
                 geometry: {
                     type: "LineString",
-                    coordinates: coordinates,
+                    coordinates,
                 },
             });
 
-            // Creates a bounding box around all of the GPX coordinates
-            // - extend() expands the bounding box so that the new coordinate is inside it
-            const bounds: LngLatBounds = coordinates.reduce(
-                (bounds: LngLatBounds, coordinate: [number, number]): LngLatBounds => bounds.extend(coordinate),
-                new LngLatBounds(coordinates[0], coordinates[0])
+            // Uploaded route start marker
+            const startCoordinate = coordinates[0];
+
+            // Remove existing marker
+            if (uploadedStartMarkerRef.current) {
+                uploadedStartMarkerRef.current.remove();
+            }
+
+            // Create custom marker element
+            const markerElement =
+                createStartMarkerElement(
+                    selectedRouteColor
+                );
+
+            // Create new marker
+            uploadedStartMarkerRef.current =
+                new Marker({
+                    element: markerElement,
+                })
+                    .setLngLat(startCoordinate)
+                    .addTo(map);
+
+            // Fit map to uploaded route
+            const bounds = coordinates.reduce(
+                (
+                    bounds: LngLatBounds,
+                    coordinate: Coordinate
+                ) => bounds.extend(coordinate),
+                new LngLatBounds(
+                    coordinates[0],
+                    coordinates[0]
+                )
             );
 
-            // Pan and zoom map to fit bounding box
             map.fitBounds(bounds, {
                 padding: 50,
             });
         };
 
-        // Read file as text and put it into reader
         reader.readAsText(file);
     }
 
+    // Upload GPX to db
     async function uploadGpx() {
-        if (!gpxFile) {
-            return;
-        }
+        if (!gpxFile) return;
 
         const formData = new FormData();
+
         formData.append("file", gpxFile);
         formData.append("name", gpxFile.name);
+        formData.append("color", selectedRouteColor);
 
-        const response = await fetch("http://localhost:8080/routes", {
-            method: "POST",
-            body: formData,
-            credentials: "include", // include the user's existing session cookie
-        });
+        try {
+            const response = await fetch(
+                "http://localhost:8080/routes",
+                {
+                    method: "POST",
+                    body: formData,
+                    credentials: "include",
+                }
+            );
 
-        if (!response.ok) {
-            console.error("Failed to upload GPX");
+            if (!response.ok) {
+                console.error(
+                    "Failed to upload GPX"
+                );
+                return;
+            }
+
+            console.log(
+                "GPX uploaded successfully"
+            );
+        } catch (error) {
+            console.error(
+                "Error uploading GPX:",
+                error
+            );
+        }
+    }
+
+    // Get nearby routes
+    async function getNearbyRoutes() {
+        if (!navigator.geolocation) {
+            console.error(
+                "Geolocation is not supported"
+            );
             return;
         }
 
-        console.log("GPX uploaded successfully");
+        navigator.geolocation.getCurrentPosition(
+            async (position) => {
+                const latitude =
+                    position.coords.latitude;
+
+                const longitude =
+                    position.coords.longitude;
+
+                const radius = 20000;   // 10000
+
+                console.log(
+                    "Current location:",
+                    latitude,
+                    longitude
+                );
+
+                try {
+                    const response = await fetch(
+                        `http://localhost:8080/routes?latitude=${latitude}&longitude=${longitude}&radius=${radius}`,
+                        {
+                            credentials: "include",
+                        }
+                    );
+
+                    if (!response.ok) {
+                        console.error(
+                            "Failed to fetch nearby routes"
+                        );
+                        return;
+                    }
+
+                    const routes =
+                        (await response.json()) as CyclingRoute[];
+
+                    console.log(
+                        "Nearby routes:",
+                        routes
+                    );
+
+                    setNearbyRoutes(routes);
+                } catch (error) {
+                    console.error(
+                        "Error fetching nearby routes:",
+                        error
+                    );
+                }
+            },
+            (error) => {
+                console.error(
+                    "Could not get location:",
+                    error
+                );
+            }
+        );
     }
 
+    // Update nearby routes + start markers
+    useEffect(() => {
+        const map = mapRef.current;
+
+        if (!map) return;
+
+        const routeSource =
+            map.getSource(
+                nearbyRouteId
+            ) as GeoJSONSource;
+
+        if (!routeSource) return;
+
+        // Update nearby route lines
+        routeSource.setData({
+            type: "FeatureCollection",
+            features: nearbyRoutes.map(
+                (route) => ({
+                    type: "Feature",
+                    properties: {
+                        id: route.id,
+                        name: route.name,
+                        color: route.color
+                    },
+                    geometry: {
+                        type: "LineString",
+                        coordinates:
+                        route.coordinates,
+                    },
+                })
+            ),
+        });
+
+        // Remove old nearby start markers
+        nearbyStartMarkersRef.current.forEach(
+            (marker) => {
+                marker.remove();
+            }
+        );
+
+        nearbyStartMarkersRef.current = [];
+
+        // Create start marker for every nearby route
+        nearbyRoutes.forEach((route) => {
+            if (
+                !route.coordinates ||
+                route.coordinates.length === 0
+            ) {
+                return;
+            }
+
+            const startCoordinate =
+                route.coordinates[0] as Coordinate;
+
+            const markerElement =
+                createStartMarkerElement(
+                    route.color
+                );
+
+            const marker = new Marker({
+                element: markerElement,
+            })
+                .setLngLat(startCoordinate)
+                .addTo(map);
+
+            nearbyStartMarkersRef.current.push(
+                marker
+            );
+        });
+    }, [nearbyRoutes]);
+
+    // Initialize map + controls
     useEffect(() => {
         if (!mapContainer.current) return;
 
         const map = new Map({
             container: mapContainer.current,
-            style: "https://tiles.openfreemap.org/styles/liberty",
+            style:
+                "https://tiles.openfreemap.org/styles/liberty", // positron
             center: [-121.8863, 37.3382],
             zoom: 10,
         });
 
-        // Store map so handleGpxFile can access it
         mapRef.current = map;
 
         map.addControl(
@@ -157,8 +381,8 @@ function MapPage() {
         );
 
         map.on("load", () => {
-            // Add empty route source
-            map.addSource("route", {
+            // Uploaded route source
+            map.addSource(uploadedRouteId, {
                 type: "geojson",
                 data: {
                     type: "Feature",
@@ -170,27 +394,127 @@ function MapPage() {
                 },
             });
 
-            // Draw the route
+            // Uploaded route white outline
             map.addLayer({
-                id: "route-line",
+                id: "route-line-outline",
                 type: "line",
-                source: "route",
+                source: uploadedRouteId,
                 layout: {
                     "line-join": "round",
                     "line-cap": "round",
                 },
                 paint: {
-                    "line-color": "#ff0000",
+                    "line-color": "#ffffff",
+                    "line-width": 10,
+                    "line-opacity": 0.9,
+                },
+            });
+
+            // Uploaded route
+            map.addLayer({
+                id: "route-line",
+                type: "line",
+                source: uploadedRouteId,
+                layout: {
+                    "line-join": "round",
+                    "line-cap": "round",
+                },
+                paint: {
+                    "line-color": "#e66465",
                     "line-width": 5,
+                },
+            });
+
+            // Nearby routes source
+            map.addSource(nearbyRouteId, {
+                type: "geojson",
+                data: {
+                    type: "FeatureCollection",
+                    features: [],
+                },
+            });
+
+            // Nearby routes white outline
+            map.addLayer({
+                id:
+                    "nearby-route-lines-outline",
+                type: "line",
+                source: nearbyRouteId,
+                layout: {
+                    "line-join": "round",
+                    "line-cap": "round",
+                },
+                paint: {
+                    "line-color": "#ffffff",
+                    "line-width": 10,
+                    "line-opacity": 0.9,
+                },
+            });
+
+            // Nearby routes
+            map.addLayer({
+                id: "nearby-route-lines",
+                type: "line",
+                source: nearbyRouteId,
+                layout: {
+                    "line-join": "round",
+                    "line-cap": "round",
+                },
+                paint: {
+                    "line-color": [
+                        "coalesce", // use route's color
+                        ["get", "color"],
+                        "#0000ff",  // use fallback blue
+                    ],
+                    "line-width": 4,
                 },
             });
         });
 
         return () => {
+            // Remove uploaded start marker
+            if (uploadedStartMarkerRef.current) {
+                uploadedStartMarkerRef.current.remove();
+                uploadedStartMarkerRef.current =
+                    null;
+            }
+
+            // Remove nearby start markers
+            nearbyStartMarkersRef.current.forEach(
+                (marker) => {
+                    marker.remove();
+                }
+            );
+
+            nearbyStartMarkersRef.current = [];
+
             map.remove();
             mapRef.current = null;
         };
     }, []);
+
+    // Update uploaded route color + start marker
+    useEffect(() => {
+        const map = mapRef.current;
+
+        // Update color
+        if (map && map.getLayer("route-line")) {
+            map.setPaintProperty(
+                "route-line",
+                "line-color",
+                selectedRouteColor
+            );
+        }
+
+        const marker = uploadedStartMarkerRef.current;
+
+        // Update marker color
+        if (marker) {
+            const element = marker.getElement();
+
+            element.style.backgroundColor = selectedRouteColor;
+        }
+    }, [selectedRouteColor]);
 
     return (
         <div className="map-page">
@@ -200,10 +524,36 @@ function MapPage() {
             />
 
             {gpxFile && (
-                <button onClick={uploadGpx}>
-                    Upload Route
-                </button>
+                <>
+                    <div>
+                        <input
+                            type="color"
+                            id="route-color"
+                            name="route-color"
+                            value={
+                                selectedRouteColor
+                            }
+                            onChange={(e) =>
+                                setSelectedRouteColor(
+                                    e.target.value
+                                )
+                            }
+                        />
+
+                        <label htmlFor="route-color">
+                            Route color
+                        </label>
+                    </div>
+
+                    <button onClick={uploadGpx}>
+                        Upload Route
+                    </button>
+                </>
             )}
+
+            <button onClick={getNearbyRoutes}>
+                Get nearby routes
+            </button>
 
             <div
                 className="map-container"

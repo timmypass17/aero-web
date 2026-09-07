@@ -1,5 +1,6 @@
 package com.example.aero.controllers;
 
+import com.example.aero.models.CyclingRoute;
 import com.example.aero.models.CyclingRouteRequest;
 import com.example.aero.services.CyclingRouteService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 
 @RestController
 @RequestMapping("/routes")
@@ -31,8 +33,19 @@ public class CyclingRouteController {
         cyclingRouteService.saveRoute(
                 request.getFile(),
                 request.getName(),
-                authentication.getName()
+                authentication.getName(),
+                request.getColor()
         );
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping
+    public ResponseEntity<List<CyclingRoute>> getRoutes(
+            @RequestParam double latitude,
+            @RequestParam double longitude,
+            @RequestParam double radius
+    ) {
+        List<CyclingRoute> routes = cyclingRouteService.getRoutes(latitude, longitude, radius);
+        return ResponseEntity.ok(routes);
     }
 }

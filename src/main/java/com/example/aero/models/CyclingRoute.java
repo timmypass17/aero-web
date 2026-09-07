@@ -1,7 +1,10 @@
 package com.example.aero.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 import org.locationtech.jts.geom.LineString;
 
@@ -22,6 +25,9 @@ public class CyclingRoute {
     @Column(name = "elevation_gain")
     private Double elevationGain;
 
+    @Column(name = "color")
+    private String color;
+
     @Column(name = "gpx_data", columnDefinition = "BYTEA", nullable = false)
     private byte[] gpxData; // store .gpx as bytes TODO: store somewhere else? file system? supabase storage?
 
@@ -38,6 +44,46 @@ public class CyclingRoute {
     public CyclingRoute() {
     }
 
+    public UUID getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    // Prevent Jackson from serializing this object
+    // note: Jackson uses getters when serializing Java objects into JSON
+    @JsonIgnore
+    public LineString getRouteGeometry() {
+        return routeGeometry;
+    }
+
+    public List<List<Double>> getCoordinates() {
+        return Arrays.stream(routeGeometry.getCoordinates())
+                .map(coordinate -> List.of(
+                        coordinate.getX(), // longitude
+                        coordinate.getY()  // latitude
+                ))
+                .toList();
+    }
+
+    public Double getDistance() {
+        return distance;
+    }
+
+    public Double getElevationGain() {
+        return elevationGain;
+    }
+
+    public UUID getUserId() {
+        return user.getId();
+    }
+
+    public String getColor() {
+        return color;
+    }
+
     public void setName(String name) {
         this.name = name;
     }
@@ -52,5 +98,9 @@ public class CyclingRoute {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public void setColor(String color) {
+        this.color = color;
     }
 }

@@ -39,7 +39,8 @@ public class CyclingRouteService {
     public CyclingRoute saveRoute(
             MultipartFile file,
             String name,
-            String username
+            String username,
+            String color
     ) throws IOException {
 
         User user = userRepository.findByUsername(username)
@@ -65,8 +66,21 @@ public class CyclingRouteService {
         route.setGpxData(file.getBytes());
         route.setRouteGeometry(routeGeometry);
         route.setUser(user);
+        route.setColor(color);
 
         return cyclingRouteRepository.save(route);
+    }
+
+    public List<CyclingRoute> getRoutes(double latitude, double longitude, double radius) {
+        List<CyclingRoute> routes = cyclingRouteRepository.findNearbyRoutes(
+                latitude,
+                longitude,
+                radius
+        );
+
+        routes.stream()
+                .forEach(route -> System.out.println(route.getCoordinates().size()));
+        return routes;
     }
 
     private List<Coordinate> parseGpx(MultipartFile file) throws IOException {
