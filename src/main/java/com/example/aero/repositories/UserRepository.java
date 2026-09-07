@@ -1,4 +1,4 @@
-package com.example.aero.daos;
+package com.example.aero.repositories;
 
 import com.example.aero.models.User;
 import org.springframework.data.jpa.repository.JpaRepository;

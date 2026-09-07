@@ -1,6 +1,6 @@
 package com.example.aero.services;
 
-import com.example.aero.daos.UserRepository;
+import com.example.aero.repositories.UserRepository;
 import com.example.aero.models.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

@@ -4,6 +4,8 @@ import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage.tsx";
 import HomePage from "./pages/HomePage.tsx";
 import ProtectedRoute from "./components/ProtectedRoute";
+import MapPage from "./pages/Map/MapPage.tsx";
+
 
 function App() {
     return (
@@ -15,14 +17,10 @@ function App() {
                 <Route path="/signup" element={<SignupPage />} />
 
                 {/* Protected routes */}
-                <Route
-                    path="/"
-                    element={
-                        <ProtectedRoute>
-                            <HomePage />
-                        </ProtectedRoute>
-                    }
-                />
+                <Route element={<ProtectedRoute />}>
+                    <Route path="/" element={<HomePage />} />
+                    <Route path="/map" element={<MapPage />} />
+                </Route>
 
             </Routes>
         </BrowserRouter>

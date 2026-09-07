@@ -1,8 +1,8 @@
-import {useEffect, useState} from "react";
-import {Navigate} from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Navigate, Outlet } from "react-router-dom";
+import TopNavBar from "./TopNavBar/TopNavBar.tsx";
 
-function ProtectedRoute({children}: { children: React.ReactNode }) {
-
+function ProtectedRoute() {
     const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
 
     useEffect(() => {
@@ -17,18 +17,21 @@ function ProtectedRoute({children}: { children: React.ReactNode }) {
             });
     }, []);
 
-    // Wait for Spring to tell us
     if (isLoggedIn === null) {
         return <p>Loading...</p>;
     }
 
-    // Spring says we're not authenticated
     if (!isLoggedIn) {
-        return <Navigate to="/login" replace/>;
+        return <Navigate to="/login" replace />;
     }
 
-    // Spring says we're authenticated
-    return children;
+    return (
+        <>
+            <TopNavBar />
+            {/*Outlet - Renders the matching child route of a parent route*/}
+            <Outlet />
+        </>
+    );
 }
 
 export default ProtectedRoute;

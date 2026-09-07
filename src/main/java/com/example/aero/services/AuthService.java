@@ -1,12 +1,10 @@
 package com.example.aero.services;
 
-import com.example.aero.daos.UserRepository;
+import com.example.aero.repositories.UserRepository;
 import com.example.aero.exceptions.UsernameAlreadyExistsException;
 import com.example.aero.models.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @Service
 public class AuthService {

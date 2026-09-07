@@ -82,7 +82,9 @@ public class SecurityConfig {
                     .requestMatchers(
                             "/auth/logout"
                     ).permitAll()
-
+                    .requestMatchers(
+                            "/auth/me"
+                    ).authenticated()
                     // Every other endpoint requires the user
                     // to be authenticated.
                     .anyRequest().authenticated()

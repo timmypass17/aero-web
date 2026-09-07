@@ -1,6 +1,6 @@
 package com.example.aero.services;
 
-import com.example.aero.daos.UserRepository;
+import com.example.aero.repositories.UserRepository;
 import com.example.aero.models.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

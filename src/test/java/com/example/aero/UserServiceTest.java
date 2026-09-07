@@ -1,6 +1,6 @@
 package com.example.aero;
 
-import com.example.aero.daos.UserRepository;
+import com.example.aero.repositories.UserRepository;
 import com.example.aero.models.User;
 import com.example.aero.services.UserService;
 import org.junit.jupiter.api.Test;
