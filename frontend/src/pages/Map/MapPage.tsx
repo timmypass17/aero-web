@@ -34,6 +34,16 @@ function MapPage() {
 
     const [selectedRouteColor, setSelectedRouteColor] = useState(defaultSelectedColor);
 
+    const [searchRadius, setSearchRadius] = useState(10);
+
+    function handleSearch(e: React.FormEvent<HTMLFormElement>) {
+        e.preventDefault();
+
+        // 1. Geocode the search input
+        // 2. Get coordinates
+        // 3. Search for routes within searchRadius
+    }
+
     // Create a custom start marker
     function createStartMarkerElement(color: string) {
         const element = document.createElement("div");
@@ -555,42 +565,70 @@ function MapPage() {
 
     return (
         <div className="map-page">
-            <GPXUpload
-                gpxFile={gpxFile}
-                setGpxFile={handleGpxFile}
-            />
+            <div className="map-controls">
 
-            {gpxFile && (
-                <>
-                    <div>
-                        <input
-                            type="color"
-                            id="route-color"
-                            name="route-color"
-                            value={
-                                selectedRouteColor
-                            }
-                            onChange={(e) =>
-                                setSelectedRouteColor(
-                                    e.target.value
-                                )
-                            }
-                        />
+                <form
+                    className="map-search"
+                    onSubmit={handleSearch}
+                >
+                    <input
+                        type="text"
+                        placeholder="Search location..."
+                        className="map-search-input"
+                    />
 
-                        <label htmlFor="route-color">
-                            Route color
-                        </label>
-                    </div>
+                    <select
+                        value={searchRadius}
+                        onChange={(e) =>
+                            setSearchRadius(Number(e.target.value))
+                        }
+                    >
+                        <option value={1}>1 km</option>
+                        <option value={5}>5 km</option>
+                        <option value={10}>10 km</option>
+                        <option value={25}>25 km</option>
+                        <option value={50}>50 km</option>
+                    </select>
 
-                    <button onClick={uploadGpx}>
-                        Upload Route
+                    <button type="submit" className="map-search-button">
+                        Search
                     </button>
-                </>
-            )}
+                </form>
 
-            <button onClick={getNearbyRoutes}>
-                Get nearby routes
-            </button>
+                <GPXUpload
+                    gpxFile={gpxFile}
+                    setGpxFile={handleGpxFile}
+                />
+
+                {gpxFile && (
+                    <>
+                        <div>
+                            <input
+                                type="color"
+                                id="route-color"
+                                name="route-color"
+                                value={selectedRouteColor}
+                                onChange={(e) =>
+                                    setSelectedRouteColor(e.target.value)
+                                }
+                            />
+
+                            <label htmlFor="route-color">
+                                Route color
+                            </label>
+                        </div>
+
+                        <button onClick={uploadGpx}>
+                            Upload Route
+                        </button>
+                    </>
+                )}
+
+                <button onClick={getNearbyRoutes}>
+                    Get nearby routes
+                </button>
+
+            </div>
 
             <div
                 className="map-container"
