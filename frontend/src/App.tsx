@@ -4,7 +4,7 @@ import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage.tsx";
 import HomePage from "./pages/HomePage.tsx";
 import ProtectedRoute from "./components/ProtectedRoute";
-import MapPage from "./pages/Map/MapPage.tsx";
+import MapPage from "./pages/MapPage/MapPage.tsx";
 import "./styles/App..css"
 
 function App() {
