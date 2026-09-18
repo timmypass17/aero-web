@@ -1,6 +1,5 @@
 import GPXUpload from "../../../components/GPXUpload/GPXUpload";
 import RouteColorPicker from "./RouteColorPicker";
-import type { CyclingRoute } from "../../../types/CyclingRoute";
 
 interface MapControlsProps {
     gpxFile: File | null;
@@ -9,7 +8,7 @@ interface MapControlsProps {
     selectedRouteColor: string;
     setSelectedRouteColor: (color: string) => void;
 
-    onNearbyRoutes: Dispatch<SetStateAction<CyclingRoute[]>>;
+    getNearbyRoutes: () => void;
 }
 
 function MapControls({
@@ -17,8 +16,9 @@ function MapControls({
                          setGpxFile,
                          selectedRouteColor,
                          setSelectedRouteColor,
-                         onNearbyRoutes,
+                         getNearbyRoutes,
                      }: MapControlsProps) {
+
     async function uploadGpx() {
         if (!gpxFile) return;
 
@@ -27,6 +27,7 @@ function MapControls({
         formData.append("file", gpxFile);
         formData.append("name", gpxFile.name);
         formData.append("color", selectedRouteColor);
+        formData.append("difficulty", "easy");
 
         try {
             const response = await fetch(
@@ -43,72 +44,18 @@ function MapControls({
                 return;
             }
 
-            const uploadedRoute =
-                (await response.json()) as CyclingRoute;
-
-            onNearbyRoutes((currentRoutes) => [
-                ...currentRoutes,
-                uploadedRoute,
-            ]);
-
             setGpxFile(null);
             setSelectedRouteColor("#e66465");
+
+            // Refresh nearby routes after upload
+            getNearbyRoutes();
+
         } catch (error) {
             console.error(
                 "Error uploading GPX:",
                 error
             );
         }
-    }
-
-    async function getNearbyRoutes() {
-        if (!navigator.geolocation) {
-            console.error(
-                "Geolocation is not supported"
-            );
-            return;
-        }
-
-        navigator.geolocation.getCurrentPosition(
-            async (position) => {
-                const {
-                    latitude,
-                    longitude,
-                } = position.coords;
-
-                try {
-                    const response = await fetch(
-                        `http://localhost:8080/routes?latitude=${latitude}&longitude=${longitude}&radius=20000`,
-                        {
-                            credentials: "include",
-                        }
-                    );
-
-                    if (!response.ok) {
-                        console.error(
-                            "Failed to fetch nearby routes"
-                        );
-                        return;
-                    }
-
-                    const routes =
-                        (await response.json()) as CyclingRoute[];
-
-                    onNearbyRoutes(routes);
-                } catch (error) {
-                    console.error(
-                        "Error fetching nearby routes:",
-                        error
-                    );
-                }
-            },
-            (error) => {
-                console.error(
-                    "Could not get location:",
-                    error
-                );
-            }
-        );
     }
 
     return (

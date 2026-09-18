@@ -2,15 +2,27 @@ import type { CyclingRoute } from "../types/CyclingRoute";
 
 const API_URL = "http://localhost:8080";
 
-export async function uploadRoute(
-    file: File,
-    color: string
+export interface CreateRouteRequest {
+    name: string;
+    description: string;
+    gpxFile: File;
+    thumbnail: File | null;
+    routeColor: string;
+}
+
+export async function createRoute(
+    request: CreateRouteRequest
 ): Promise<CyclingRoute> {
     const formData = new FormData();
 
-    formData.append("file", file);
-    formData.append("name", file.name);
-    formData.append("color", color);
+    formData.append("name", request.name);
+    formData.append("description", request.description);
+    formData.append("file", request.gpxFile);
+    // TODO: Add thumbnail
+    if (request.thumbnail) {
+        formData.append("thumbnail", request.thumbnail);
+    }
+    formData.append("color", request.routeColor);
 
     const response = await fetch(
         `${API_URL}/routes`,

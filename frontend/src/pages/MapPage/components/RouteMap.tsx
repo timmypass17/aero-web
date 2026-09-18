@@ -321,6 +321,7 @@ function RouteMap({
                     )
                     .addTo(map);
 
+
             nearbyMarkersRef.current.push(
                 marker
             );

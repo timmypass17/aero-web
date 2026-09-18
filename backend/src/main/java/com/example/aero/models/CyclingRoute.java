@@ -19,14 +19,23 @@ public class CyclingRoute {
     @Column(name = "name")
     private String name;
 
+    @Column(name = "description")
+    private String description;
+
     @Column(name = "distance")
     private Double distance;
+
+    @Column(name = "duration")
+    private Long duration; // duration in seconds
 
     @Column(name = "elevation_gain")
     private Double elevationGain;
 
     @Column(name = "color")
     private String color;
+
+    @Column(name = "difficulty")
+    private String difficulty;
 
     @Column(name = "gpx_data", columnDefinition = "BYTEA", nullable = false)
     private byte[] gpxData; // store .gpx as bytes TODO: store somewhere else? file system? supabase storage?
@@ -35,7 +44,7 @@ public class CyclingRoute {
             name = "route_geometry",
             columnDefinition = "geography(LineString, 4326)"
     )
-    private LineString routeGeometry;   // object that contains an ordered list of coordinates
+    private LineString routeGeometry; // object that contains an ordered list of coordinates
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
@@ -68,8 +77,16 @@ public class CyclingRoute {
                 .toList();
     }
 
+    public String getDescription() {
+        return description;
+    }
+
     public Double getDistance() {
         return distance;
+    }
+
+    public Long getDuration() {
+        return duration;
     }
 
     public Double getElevationGain() {
@@ -84,8 +101,16 @@ public class CyclingRoute {
         return color;
     }
 
+    public String getDifficulty() {
+        return difficulty;
+    }
+
     public void setName(String name) {
         this.name = name;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public void setGpxData(byte[] bytes) {
@@ -102,5 +127,21 @@ public class CyclingRoute {
 
     public void setColor(String color) {
         this.color = color;
+    }
+
+    public void setDifficulty(String difficulty) {
+        this.difficulty = difficulty;
+    }
+
+    public void setDistance(Double distance) {
+        this.distance = distance;
+    }
+
+    public void setDuration(Long duration) {
+        this.duration = duration;
+    }
+
+    public void setElevationGain(Double elevationGain) {
+        this.elevationGain = elevationGain;
     }
 }

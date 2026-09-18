@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import MapControls from "./components/MapControls";
-import MapSearch from "./components/MapSearch";
 import RouteMap from "./components/RouteMap";
+import MapResults from "./MapResults/MapResults.tsx";
 
 import type { CyclingRoute } from "../../types/CyclingRoute";
 
@@ -18,21 +18,61 @@ function MapPage() {
     const [selectedRouteColor, setSelectedRouteColor] =
         useState("#e66465");
 
-    const [searchRadius, setSearchRadius] =
-        useState(10);
+    async function getNearbyRoutes() {
+        if (!navigator.geolocation) {
+            console.error("Geolocation is not supported");
+            return;
+        }
+
+        navigator.geolocation.getCurrentPosition(
+            async (position) => {
+                const {
+                    latitude,
+                    longitude,
+                } = position.coords;
+
+                try {
+                    const response = await fetch(
+                        `http://localhost:8080/routes?latitude=${latitude}&longitude=${longitude}&radius=20000`,
+                        {
+                            credentials: "include",
+                        }
+                    );
+
+                    if (!response.ok) {
+                        console.error(
+                            "Failed to fetch nearby routes"
+                        );
+                        return;
+                    }
+
+                    const routes =
+                        (await response.json()) as CyclingRoute[];
+
+                    setNearbyRoutes(routes);
+                } catch (error) {
+                    console.error(
+                        "Error fetching nearby routes:",
+                        error
+                    );
+                }
+            },
+            (error) => {
+                console.error(
+                    "Could not get location:",
+                    error
+                );
+            }
+        );
+    }
+
+    useEffect(() => {
+        getNearbyRoutes();
+    }, []);
 
     return (
         <div className="map-page">
             <div className="map-controls">
-
-                <MapSearch
-                    searchRadius={searchRadius}
-                    setSearchRadius={setSearchRadius}
-                    onSearch={() => {
-                        // TODO
-                    }}
-                />
-
                 <MapControls
                     gpxFile={gpxFile}
                     setGpxFile={setGpxFile}
@@ -40,12 +80,14 @@ function MapPage() {
                     setSelectedRouteColor={
                         setSelectedRouteColor
                     }
-                    onNearbyRoutes={
-                        setNearbyRoutes
-                    }
+                    getNearbyRoutes={getNearbyRoutes}
                 />
-
             </div>
+
+            <MapResults
+                nearbyRoutes={nearbyRoutes}
+                getNearbyRoutes={getNearbyRoutes}
+            />
 
             <RouteMap
                 gpxFile={gpxFile}

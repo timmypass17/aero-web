@@ -2,8 +2,12 @@ export interface CyclingRoute {
     id: string;
     name: string;
     distance: number;
+    duration: number;
     elevationGain: number;
-    userId: string;
-    coordinates: [number, number][];
     color: string;
+    difficulty: string;
+    rating: number;
+    rideCount: number;
+    coordinates: number[][];
+    userId: string;
 }

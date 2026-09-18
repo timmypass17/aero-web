@@ -18,7 +18,6 @@ function LoginPage() {
                 headers: {
                     "Content-Type": "application/json",
                 },
-                // Include cookies when making this request, even when the frontend and backend are on different origins.
                 credentials: "include",
                 body: JSON.stringify({
                     username,
@@ -58,8 +57,12 @@ function LoginPage() {
 
             </form>
 
-            <button onClick={() => navigate("/signup")}>
+            <button className="primary-button" onClick={() => navigate("/signup")}>
                 Sign Up
+            </button>
+
+            <button className="secondary-button" onClick={() => navigate("/")}>
+                Continue as Guest
             </button>
         </div>
     );

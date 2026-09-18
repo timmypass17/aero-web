@@ -14,6 +14,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.web.bind.annotation.*;
 
@@ -80,6 +81,21 @@ public class AuthController {
                     .status(HttpStatus.UNAUTHORIZED)
                     .build();
         }
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            Authentication authentication) {
+
+        new SecurityContextLogoutHandler().logout(
+                request,
+                response,
+                authentication
+        );
+
+        return ResponseEntity.ok().build();
     }
 
     // "Does my current Spring Security session have an authenticated user?"

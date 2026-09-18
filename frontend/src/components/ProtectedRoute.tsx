@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { Navigate, Outlet } from "react-router-dom";
-import TopNavBar from "./TopNavBar/TopNavBar.tsx";
 
 function ProtectedRoute() {
     const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
@@ -27,7 +26,6 @@ function ProtectedRoute() {
 
     return (
         <>
-            <TopNavBar />
             {/*Outlet - Renders the matching child route of a parent route*/}
             <Outlet />
         </>

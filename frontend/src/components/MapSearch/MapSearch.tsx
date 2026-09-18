@@ -1,3 +1,5 @@
+import "./MapSearch.css";
+
 interface MapSearchProps {
     searchRadius: number;
     setSearchRadius: (radius: number) => void;
@@ -45,7 +47,7 @@ function MapSearch({
 
             <button
                 type="submit"
-                className="map-search-button"
+                className="primary-button"
             >
                 Search
             </button>

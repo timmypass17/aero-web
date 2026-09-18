@@ -2,6 +2,7 @@ package com.example.aero.configs;
 
 import java.util.List;
 
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -78,6 +79,18 @@ public class SecurityConfig {
                             "/auth/login"
                     ).permitAll()
 
+                    // Anyone can view home
+                    .requestMatchers(
+                            HttpMethod.GET,
+                            "/"
+                    ).permitAll()
+
+                    // Anyone can fetch routes
+                    .requestMatchers(
+                            HttpMethod.GET,
+                            "/routes"
+                    ).permitAll()
+
                     // Anyone can log out.
                     .requestMatchers(
                             "/auth/logout"
@@ -85,6 +98,8 @@ public class SecurityConfig {
                     .requestMatchers(
                             "/auth/me"
                     ).authenticated()
+
+
                     // Every other endpoint requires the user
                     // to be authenticated.
                     .anyRequest().authenticated()
@@ -95,6 +110,11 @@ public class SecurityConfig {
 
                     // POST /auth/logout will log the user out.
                     .logoutUrl("/auth/logout")
+
+                    // Don't redirect to /login?logout.
+                    .logoutSuccessHandler((request, response, authentication) -> {
+                        response.setStatus(HttpServletResponse.SC_OK);
+                    })
 
                     // Allow the logout request.
                     .permitAll()
