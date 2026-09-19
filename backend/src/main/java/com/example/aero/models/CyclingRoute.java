@@ -31,6 +31,9 @@ public class CyclingRoute {
     @Column(name = "elevation_gain")
     private Double elevationGain;
 
+    @Column(name = "thumbnail_key")
+    private String thumbnailKey;
+
     @Column(name = "color")
     private String color;
 
@@ -97,6 +100,10 @@ public class CyclingRoute {
         return user.getId();
     }
 
+    public String getThumbnailKey() {
+        return thumbnailKey;
+    }
+
     public String getColor() {
         return color;
     }
@@ -123,6 +130,10 @@ public class CyclingRoute {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public void setThumbnailKey(String thumbnailKey) {
+        this.thumbnailKey = thumbnailKey;
     }
 
     public void setColor(String color) {

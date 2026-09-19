@@ -31,20 +31,24 @@ public class CyclingRouteService {
 
     private final CyclingRouteRepository cyclingRouteRepository;
     private final UserRepository userRepository;
+    private final S3Service s3Service;
 
     @Autowired
     public CyclingRouteService(
             CyclingRouteRepository cyclingRouteRepository,
-            UserRepository userRepository
+            UserRepository userRepository,
+            S3Service s3Service
     ) {
         this.cyclingRouteRepository = cyclingRouteRepository;
         this.userRepository = userRepository;
+        this.s3Service = s3Service;
     }
 
     public CyclingRoute createRoute(
             String name,
             String description,
-            MultipartFile file,
+            MultipartFile gpxFile,
+            MultipartFile thumbnail,
             String username,
             String color,
             String difficulty
@@ -53,8 +57,17 @@ public class CyclingRouteService {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
+        String thumbnailKey = null;
+
+        if (thumbnail != null && !thumbnail.isEmpty()) {
+            thumbnailKey = s3Service.uploadThumbnail(
+                    thumbnail,
+                    user.getId().toString()
+            );
+        }
+
         // Parse GPX and calculate route information
-        GpxData gpxData = parseGpx(file);
+        GpxData gpxData = parseGpx(gpxFile);
 
         // Create LineString
         GeometryFactory geometryFactory = new GeometryFactory();
@@ -71,9 +84,10 @@ public class CyclingRouteService {
 
         route.setName(name);
         route.setDescription(description);
-        route.setGpxData(file.getBytes());
+        route.setGpxData(gpxFile.getBytes());
         route.setRouteGeometry(routeGeometry);
         route.setUser(user);
+        route.setThumbnailKey(thumbnailKey);
         route.setColor(color);
         route.setDifficulty(difficulty);
 

@@ -33,6 +33,7 @@ public class CyclingRouteController {
                 request.getName(),
                 request.getDescription(),
                 request.getFile(),
+                request.getThumbnail(),
                 authentication.getName(),
                 request.getColor(),
                 request.getDifficulty()

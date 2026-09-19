@@ -7,6 +7,7 @@ public class CyclingRouteRequest {
     private String name;
     private String description;
     private MultipartFile file;
+    private MultipartFile thumbnail;
     private String color;
     private String difficulty;
 
@@ -20,6 +21,10 @@ public class CyclingRouteRequest {
 
     public MultipartFile getFile() {
         return file;
+    }
+
+    public MultipartFile getThumbnail() {
+        return thumbnail;
     }
 
     public String getColor() {
@@ -40,6 +45,10 @@ public class CyclingRouteRequest {
 
     public void setFile(MultipartFile file) {
         this.file = file;
+    }
+
+    public void setThumbnail(MultipartFile thumbnail) {
+        this.thumbnail = thumbnail;
     }
 
     public void setColor(String color) {

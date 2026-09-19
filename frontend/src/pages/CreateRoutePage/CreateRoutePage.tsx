@@ -200,7 +200,7 @@ function CreateRoutePage() {
         }
 
         console.log({
-            name: name,
+            name,
             description,
             gpxFile,
             thumbnail,
@@ -209,7 +209,7 @@ function CreateRoutePage() {
         });
         try {
             const route = await createRoute({
-                name: name,
+                name,
                 description,
                 gpxFile,
                 thumbnail,
