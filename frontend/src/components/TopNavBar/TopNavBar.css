@@ -1,0 +1,203 @@
+.top-nav {
+    height: 64px;
+    width: 100%;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 0 24px;
+    box-sizing: border-box;
+
+    background: #ffffff;
+    border-bottom: 1px solid #E5E7EB;
+
+    position: relative;
+    z-index: 100;
+}
+
+/* Left side */
+
+.nav-left {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+}
+
+.nav-logo {
+    color: #0F172A;
+    text-decoration: none;
+
+    font-size: 21px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+}
+
+.nav-link {
+    color: #475569;
+    text-decoration: none;
+
+    font-size: 14px;
+    font-weight: 500;
+
+    transition: color 0.15s ease;
+}
+
+.nav-link:hover {
+    color: #0F172A;
+}
+
+/* Right side */
+
+.nav-right {
+    display: flex;
+    align-items: center;
+}
+
+/* Search */
+
+.top-nav .map-search {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.top-nav .map-search-input {
+    width: 280px;
+    height: 36px;
+
+    padding: 0 12px;
+
+    border: 1px solid #CBD5E1;
+    border-radius: 8px;
+
+    background: #F8FAFC;
+    color: #0F172A;
+
+    font-size: 14px;
+
+    outline: none;
+    box-sizing: border-box;
+
+    transition:
+            border-color 0.15s ease,
+            background-color 0.15s ease;
+}
+
+.top-nav .map-search-input:focus {
+    background: #ffffff;
+    border-color: #94A3B8;
+}
+
+.create-route-button {
+    height: 36px;
+
+    padding: 0 14px;
+
+    border-radius: 8px;
+
+    background: #16a34a;
+    color: #ffffff;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    text-decoration: none;
+
+    display: flex;
+    align-items: center;
+
+    cursor: pointer;
+
+    transition:
+            background-color 0.15s ease,
+            transform 0.1s ease;
+}
+
+.create-route-button:hover {
+    background: #15803d;
+}
+
+.create-route-button:active {
+    transform: translateY(1px);
+}
+
+.new-menu {
+    position: relative;
+}
+
+.create-route-button {
+    height: 36px;
+    padding: 0 14px;
+
+    border: none;
+    border-radius: 8px;
+
+    background: #16a34a;
+    color: #ffffff;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    cursor: pointer;
+
+    transition:
+            background-color 0.15s ease,
+            transform 0.1s ease;
+}
+
+.create-route-button:hover {
+    background: #15803d;
+}
+
+.create-route-button:active {
+    transform: translateY(1px);
+}
+
+.new-menu-arrow {
+    font-size: 11px;
+}
+
+.new-menu-dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+
+    min-width: 180px;
+
+    background: #ffffff;
+    border: 1px solid #E2E8F0;
+    border-radius: 8px;
+
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+
+    padding: 6px;
+
+    z-index: 1000;
+}
+
+.new-menu-item {
+    display: block;
+
+    padding: 9px 12px;
+
+    border-radius: 6px;
+
+    color: #0F172A;
+    text-decoration: none;
+
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.new-menu-item:hover {
+    background: #F1F5F9;
+}
