@@ -24,12 +24,8 @@ function ProtectedRoute() {
         return <Navigate to="/login" replace />;
     }
 
-    return (
-        <>
-            {/*Outlet - Renders the matching child route of a parent route*/}
-            <Outlet />
-        </>
-    );
+    {/*Outlet - Renders the matching child route of a parent route*/}
+    return <Outlet />
 }
 
 export default ProtectedRoute;

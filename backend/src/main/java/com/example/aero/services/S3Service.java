@@ -1,5 +1,6 @@
 package com.example.aero.services;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.sync.RequestBody;
@@ -20,7 +21,8 @@ public class S3Service {
     private final S3Client s3Client;
     private final S3Presigner presigner;
 
-    private final String bucketName = "aero-route-images-timmy";
+    @Value("${aws.s3.bucket-name}")
+    private String bucketName;
 
     public S3Service(S3Client s3Client, S3Presigner presigner) {
         this.s3Client = s3Client;

@@ -2,7 +2,7 @@ import TopNavBar from './TopNavBar/TopNavBar';
 import { Outlet } from "react-router-dom";
 import { useState } from 'react';
 
-function ProtectedLayout() {
+function AppLayout() {
     const [searchRadius, setSearchRadius] = useState(10);
 
     function handleSearch(query: string, radius: number) {
@@ -25,4 +25,4 @@ function ProtectedLayout() {
     );
 }
 
-export default ProtectedLayout;
+export default AppLayout;

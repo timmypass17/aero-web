@@ -1,12 +1,11 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-
-import LoginPage from "./pages/LoginPage";
-import SignupPage from "./pages/SignupPage.tsx";
+import LoginPage from "./pages/LoginPage/LoginPage.tsx";
+import SignupPage from "./pages/SignupPage/SignupPage.tsx";
 import HomePage from "./pages/HomePage.tsx";
 import ProtectedRoute from "./components/ProtectedRoute";
 import MapPage from "./pages/MapPage/MapPage.tsx";
-import ProtectedLayout from "./components/ProtectedLayout.tsx";
-import "./styles/App.css"
+import AppLayout from "./components/AppLayout.tsx";
+import "./styles/App.css";
 import CreateRoutePage from "./pages/CreateRoutePage/CreateRoutePage.tsx";
 
 function App() {
@@ -15,7 +14,7 @@ function App() {
             <Routes>
 
                 {/* Public */}
-                <Route element={<ProtectedLayout />}>
+                <Route element={<AppLayout />}>
                     <Route path="/" element={<HomePage />} />
                     <Route path="/map" element={<MapPage />} />
                 </Route>
@@ -26,10 +25,10 @@ function App() {
 
                 {/* Authenticated */}
                 <Route element={<ProtectedRoute />}>
-                    <Route element={<ProtectedLayout />}>
+                    {/*<Route element={<AppLayout />}>*/}
                         <Route path="/create-route" element={<>Create Route</>} />
                         <Route path="/routes/new" element={<CreateRoutePage/>} />
-                    </Route>
+                    {/*</Route>*/}
                 </Route>
 
             </Routes>
