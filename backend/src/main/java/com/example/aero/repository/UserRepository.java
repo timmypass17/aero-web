@@ -1,6 +1,6 @@
-package com.example.aero.repositories;
+package com.example.aero.repository;
 
-import com.example.aero.models.User;
+import com.example.aero.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

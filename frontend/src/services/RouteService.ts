@@ -60,3 +60,28 @@ export async function getNearbyRoutes(
 
     return response.json();
 }
+
+export type NearbyRoute = {
+    id: string;
+    name: string;
+    description?: string;
+};
+
+export async function getRouteGpx(
+    routeId: string
+): Promise<string> {
+    const response = await fetch(
+        `http://localhost:8080/routes/${routeId}/gpx`,
+        {
+            credentials: "include",
+        }
+    );
+
+    if (!response.ok) {
+        throw new Error(
+            "Failed to fetch route GPX."
+        );
+    }
+
+    return response.text();
+}

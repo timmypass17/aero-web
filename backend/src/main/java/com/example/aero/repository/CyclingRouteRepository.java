@@ -1,6 +1,6 @@
-package com.example.aero.repositories;
+package com.example.aero.repository;
 
-import com.example.aero.models.CyclingRoute;
+import com.example.aero.model.CyclingRoute;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

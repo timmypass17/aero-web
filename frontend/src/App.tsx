@@ -7,6 +7,7 @@ import MapPage from "./pages/MapPage/MapPage.tsx";
 import AppLayout from "./components/AppLayout.tsx";
 import "./styles/App.css";
 import CreateRoutePage from "./pages/CreateRoutePage/CreateRoutePage.tsx";
+import CreatePostPage from "./pages/CreatePostPage/CreatePostPage.tsx";
 
 function App() {
     return (
@@ -25,10 +26,10 @@ function App() {
 
                 {/* Authenticated */}
                 <Route element={<ProtectedRoute />}>
-                    {/*<Route element={<AppLayout />}>*/}
-                        <Route path="/create-route" element={<>Create Route</>} />
+                    <Route element={<AppLayout />}>
                         <Route path="/routes/new" element={<CreateRoutePage/>} />
-                    {/*</Route>*/}
+                        <Route path="/posts/new" element={<CreatePostPage/>} />
+                    </Route>
                 </Route>
 
             </Routes>

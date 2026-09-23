@@ -1,9 +1,9 @@
-package com.example.aero.controllers;
+package com.example.aero.controller;
 
 import com.example.aero.dto.CyclingRouteResponse;
-import com.example.aero.models.CyclingRoute;
-import com.example.aero.models.CyclingRouteRequest;
-import com.example.aero.services.CyclingRouteService;
+import com.example.aero.model.CyclingRoute;
+import com.example.aero.model.CyclingRouteRequest;
+import com.example.aero.service.CyclingRouteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;

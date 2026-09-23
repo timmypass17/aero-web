@@ -1,4 +1,4 @@
-package com.example.aero.configs;
+package com.example.aero.config;
 
 import java.util.List;
 

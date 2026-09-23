@@ -1,8 +1,8 @@
-package com.example.aero.services;
+package com.example.aero.service;
 
-import com.example.aero.repositories.UserRepository;
+import com.example.aero.repository.UserRepository;
 import com.example.aero.exceptions.UsernameAlreadyExistsException;
-import com.example.aero.models.User;
+import com.example.aero.model.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 

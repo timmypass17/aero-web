@@ -1,4 +1,4 @@
-package com.example.aero.models;
+package com.example.aero.model;
 
 import org.springframework.web.multipart.MultipartFile;
 

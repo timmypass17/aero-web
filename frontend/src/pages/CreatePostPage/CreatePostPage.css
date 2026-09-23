@@ -1,0 +1,236 @@
+.create-post-page {
+    min-height: 100vh;
+    padding: 40px 20px;
+}
+
+.create-post-container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.create-post-container h1 {
+    margin-bottom: 8px;
+}
+
+.create-post-subtitle {
+    margin-bottom: 32px;
+    color: #666;
+}
+
+.create-post-form {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-group label {
+    font-weight: 600;
+}
+
+.form-group input,
+.form-group textarea {
+    padding: 10px 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font: inherit;
+}
+
+.form-group textarea {
+    resize: vertical;
+}
+
+.form-help {
+    font-size: 14px;
+    color: #777;
+}
+
+/*
+ * Route source selection
+ */
+.route-source-options {
+    display: flex;
+    gap: 12px;
+}
+
+.route-source-option {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: normal !important;
+}
+
+.route-source-option input {
+    margin: 0;
+}
+
+/*
+ * Nearby routes
+ */
+.nearby-routes-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.refresh-routes-button {
+    padding: 6px 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    background: white;
+    cursor: pointer;
+}
+
+.refresh-routes-button:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.nearby-routes-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 260px;
+    overflow-y: auto;
+}
+
+.nearby-route-card {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    background: white;
+    text-align: left;
+    cursor: pointer;
+    font: inherit;
+}
+
+.nearby-route-card:hover {
+    background: #f8f8f8;
+}
+
+.nearby-route-card.selected {
+    border-color: #333;
+    background: #f8f8f8;
+}
+
+.nearby-route-name {
+    font-weight: 600;
+}
+
+.nearby-route-description {
+    color: #666;
+    font-size: 14px;
+}
+
+.nearby-routes-empty {
+    padding: 16px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    color: #777;
+    background: #f8f8f8;
+}
+
+/*
+ * Map
+ */
+.create-post-map {
+    width: 100%;
+    height: 400px;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #ccc;
+}
+
+/*
+ * Route color picker
+ *
+ * Matches the Create Route page styling.
+ */
+.color-picker-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.color-picker-container input[type="color"] {
+    width: 50px;
+    height: 40px;
+    padding: 2px;
+    cursor: pointer;
+}
+
+/*
+ * Route statistics
+ */
+.route-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+}
+
+.route-stat {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 16px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    background: #f8f8f8;
+}
+
+.route-stat-label {
+    font-size: 14px;
+    color: #777;
+}
+
+.route-stat-value {
+    font-size: 20px;
+    font-weight: 600;
+}
+
+/*
+ * Error
+ */
+.create-post-error {
+    padding: 12px;
+    border: 1px solid #d99;
+    border-radius: 6px;
+    background: #fff5f5;
+    color: #a33;
+}
+
+/*
+ * Submit button
+ */
+.create-post-button {
+    padding: 12px 20px;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+@media (max-width: 600px) {
+    .route-source-options {
+        flex-direction: column;
+    }
+
+    .route-stats {
+        grid-template-columns: 1fr;
+    }
+}

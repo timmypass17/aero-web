@@ -1,4 +1,4 @@
-package com.example.aero.models;
+package com.example.aero.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;

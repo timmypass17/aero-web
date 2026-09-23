@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./LoginPage.css";
+import {login} from "../../services/authService.ts";
 
 function LoginPage() {
     const [username, setUsername] = useState("");
@@ -11,20 +12,7 @@ function LoginPage() {
     async function handleLogin(event: React.SubmitEvent<HTMLFormElement>) {
         event.preventDefault();
 
-        const response = await fetch(
-            "http://localhost:8080/auth/login",
-            {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                credentials: "include",
-                body: JSON.stringify({
-                    username,
-                    password,
-                }),
-            }
-        );
+        const response = await login(username, password);
 
         if (response.ok) {
             navigate("/");

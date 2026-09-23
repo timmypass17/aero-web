@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./SignupPage.css";
+import {signup} from "../../services/authService.ts";
 
 function SignupPage() {
     const [username, setUsername] = useState("");
@@ -11,19 +12,7 @@ function SignupPage() {
     async function handleSignup(event: React.SubmitEvent<HTMLFormElement>) {
         event.preventDefault();
 
-        const response = await fetch(
-            "http://localhost:8080/auth/signup",
-            {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    username,
-                    password,
-                }),
-            }
-        );
+        const response = await signup(username, password);
 
         if (response.ok) {
             navigate("/login");

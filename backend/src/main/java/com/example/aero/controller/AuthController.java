@@ -1,9 +1,9 @@
-package com.example.aero.controllers;
+package com.example.aero.controller;
 
-import com.example.aero.models.LoginRequest;
-import com.example.aero.models.SignupRequest;
-import com.example.aero.models.User;
-import com.example.aero.services.AuthService;
+import com.example.aero.model.LoginRequest;
+import com.example.aero.model.SignupRequest;
+import com.example.aero.model.User;
+import com.example.aero.service.AuthService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpStatus;

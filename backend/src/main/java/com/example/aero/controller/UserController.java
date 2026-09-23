@@ -1,7 +1,7 @@
-package com.example.aero.controllers;
+package com.example.aero.controller;
 
-import com.example.aero.models.User;
-import com.example.aero.services.UserService;
+import com.example.aero.model.User;
+import com.example.aero.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

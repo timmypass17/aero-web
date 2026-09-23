@@ -1,4 +1,4 @@
-package com.example.aero.configs;
+package com.example.aero.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

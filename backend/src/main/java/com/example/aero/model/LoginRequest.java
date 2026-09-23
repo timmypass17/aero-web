@@ -1,10 +1,10 @@
-package com.example.aero.models;
+package com.example.aero.model;
 
-public class SignupRequest {
+public class LoginRequest {
     private String username;
     private String password;
 
-    public SignupRequest() {
+    public LoginRequest() {
     }
 
     public String getUsername() {

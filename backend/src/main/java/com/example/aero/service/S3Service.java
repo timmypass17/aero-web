@@ -1,4 +1,4 @@
-package com.example.aero.services;
+package com.example.aero.service;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
