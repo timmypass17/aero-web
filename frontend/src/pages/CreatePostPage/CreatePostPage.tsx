@@ -1,33 +1,15 @@
-import { useMemo, useState } from "react";
+import {useRef, useState} from "react";
 import "maplibre-gl/dist/maplibre-gl.css";
 import "./CreatePostPage.css";
-
 import { createPost } from "../../services/PostService.ts";
-
 import {
     calculateDistance, calculateDuration,
     calculateElevationGain,
 } from "../../utils/parseGpx.ts";
-
 import RouteMapPreview from "../../components/RouteMapPreview.tsx";
-
 import { usePostRoute } from "../../hooks/usePostRoute.ts";
-
-function formatDuration(
-    seconds: number
-): string {
-    if (seconds <= 0) {
-        return "—";
-    }
-
-    const hours = Math.floor(seconds / 3600);
-
-    const minutes = Math.floor((seconds % 3600) / 60);
-
-    return `${hours}h ${minutes
-        .toString()
-        .padStart(2, "0")}m`;
-}
+import formatDuration from "../../utils/formatDuration.ts";
+import {LngLatBounds, Map} from "maplibre-gl";
 
 const DEFAULT_ROUTE_COLOR = "#e66465";
 
@@ -47,6 +29,10 @@ function CreatePostPage() {
     const [formError, setFormError] =
         useState("");
 
+    const mapRef =
+        useRef<Map | null>(null);
+
+    // Extract route-related state to custom hook so CreatePostPage can focus on form submission
     const {
         routeSource,
         gpxFile,
@@ -62,34 +48,9 @@ function CreatePostPage() {
         handleNearbyRouteSelect,
     } = usePostRoute();
 
-    /*
-     * Derived distance.
-     */
-    const distanceMeters = useMemo(() => {
-        if (coordinates.length < 2) {
-            return 0;
-        }
-
-        return calculateDistance(coordinates);
-    }, [coordinates]);
-
-    /*
-     * Derived elevation gain.
-     */
-    const elevationGainMeters = useMemo(() => {
-        if (coordinates.length < 2) {
-            return 0;
-        }
-
-        return calculateElevationGain(coordinates);
-    }, [coordinates]);
-
-    /*
-     * Derived duration.
-     */
-    const durationSeconds = useMemo(() => {
-        return calculateDuration(startDateTime, endDateTime)
-    }, [startDateTime, endDateTime]);
+    const distanceMeters = coordinates.length < 2 ? 0 : calculateDistance(coordinates);
+    const elevationGainMeters = coordinates.length < 2 ? 0 : calculateElevationGain(coordinates);
+    const durationSeconds = calculateDuration(startDateTime, endDateTime);
 
     /*
      * Create post.
@@ -121,26 +82,75 @@ function CreatePostPage() {
             return;
         }
 
-        try {
-            const post = await createPost({
-                content: content.trim(),
-                routeId: selectedRoute?.id,
-                gpxFile: routeSource === "gpx" ? gpxFile : null,
-                startDateTime,
-                endDateTime,
-                routeColor,
-            });
-
-            console.log(
-                "Post created:",
-                post
-            );
-
-            // TODO: Add naviation after sucess creation
-        } catch (error) {
-            console.error("Failed to create post:", error);
-            setFormError("Failed to create post.");
+        // Generate image
+        if (coordinates.length < 2) {
+            return;
         }
+
+        const routeCoordinates: [number, number][] =
+            coordinates.map((coordinate) => [
+                coordinate.longitude,
+                coordinate.latitude,
+            ]);
+
+        const bounds = new LngLatBounds();
+
+        routeCoordinates.forEach((coordinate) => {
+            bounds.extend(coordinate);
+        });
+
+        const map = mapRef.current;
+
+        if (!map) {
+            return;
+        }
+
+        // Make sure the canvas matches the container size.
+        map.resize();
+
+        map.fitBounds(bounds, {
+            padding: 50,
+            maxZoom: 15,
+            duration: 0,
+        });
+
+        // Wait until MapLibre has finished rendering after panning
+        map.once("idle", () => {
+            const canvas = map.getCanvas();
+
+            canvas.toBlob(async (blob) => {
+                if (!blob) {
+                    return;
+                }
+
+                try {
+                    const post = await createPost({
+                        content: content.trim(),
+                        routeId: selectedRoute?.id,
+                        gpxFile: routeSource === "gpx" ? gpxFile : null,
+                        startDateTime,
+                        endDateTime,
+                        routeColor,
+                        routeThumbnail: blob
+                    });
+
+                    console.log(
+                        "Post created:",
+                        post
+                    );
+
+                    // TODO: Add naviation after sucess creation
+                } catch (error) {
+                    console.error("Failed to create post:", error);
+                    setFormError("Failed to create post.");
+                }
+            }, "image/png");
+
+            // const image =
+            //     canvas.toDataURL("image/png");
+            //
+            // console.log(image);
+        });
     }
 
     return (
@@ -149,7 +159,7 @@ function CreatePostPage() {
                 <h1>Create Post</h1>
 
                 <p className="create-post-subtitle">
-                    Share a cycling activity with the community.
+                    <>Share a cycling activity with the community.</>
                 </p>
 
                 <form
@@ -226,14 +236,8 @@ function CreatePostPage() {
                             />
 
                             <span className="form-help">
-                            Upload a GPX file containing your cycling route.
-                        </span>
-
-                            {gpxFile && (
-                                <span className="form-help">
-                                Selected: {gpxFile.name}
+                                Upload a GPX file containing your cycling route.
                             </span>
-                            )}
                         </div>
                     )}
 
@@ -301,6 +305,7 @@ function CreatePostPage() {
                     <RouteMapPreview
                         coordinates={coordinates}
                         routeColor={routeColor}
+                        mapRef={mapRef}
                     />
 
                     {/* Route Color */}

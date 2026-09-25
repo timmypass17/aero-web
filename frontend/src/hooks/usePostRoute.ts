@@ -40,6 +40,7 @@ export function usePostRoute() {
 
     /*
      * Handle GPX upload.
+     * - Updates coordinates aswell
      */
     async function handleGpxChange(
         event: React.ChangeEvent<HTMLInputElement>
@@ -57,29 +58,20 @@ export function usePostRoute() {
         try {
             const gpxText = await file.text();
 
-            const parsedCoordinates =
-                parseGpx(gpxText);
+            const parsedCoordinates: Coordinate[] = parseGpx(gpxText);
 
             if (parsedCoordinates.length < 2) {
-                throw new Error(
-                    "The GPX file does not contain enough track points."
-                );
+                throw new Error("The GPX file does not contain enough track points.");
             }
 
             setCoordinates(parsedCoordinates);
         } catch (error) {
-            console.error(
-                "Failed to parse GPX:",
-                error
-            );
+            console.error("Failed to parse GPX:", error);
 
             setCoordinates([]);
             setGpxFile(null);
 
-            setError(
-                error instanceof Error
-                    ? error.message
-                    : "Failed to read GPX file."
+            setError(error instanceof Error ? error.message : "Failed to read GPX file."
             );
         }
     }
@@ -158,10 +150,7 @@ export function usePostRoute() {
         setSelectedRoute(null);
         setCoordinates([]);
 
-        if (
-            source === "nearby" &&
-            nearbyRoutes.length === 0
-        ) {
+        if (source === "nearby" && nearbyRoutes.length === 0) {
             loadNearbyRoutes();
         }
     }
@@ -219,7 +208,6 @@ export function usePostRoute() {
         loadingNearbyRoutes,
         loadingRoute,
         error,
-
         handleGpxChange,
         loadNearbyRoutes,
         handleRouteSourceChange,

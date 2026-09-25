@@ -5,6 +5,7 @@ export type CreatePostRequest = {
     startDateTime: string;
     endDateTime: string;
     routeColor: string
+    routeThumbnail: Blob;
 };
 
 export async function createPost(
@@ -31,6 +32,8 @@ export async function createPost(
     }
 
     formData.append("routeColor", request.routeColor);
+
+    formData.append("routeThumbnail", request.routeThumbnail, "route-thumbnail.png");
 
     const response = await fetch(
         "http://localhost:8080/posts",

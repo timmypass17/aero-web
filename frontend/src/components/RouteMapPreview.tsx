@@ -5,22 +5,22 @@ import {
     Map,
     NavigationControl,
 } from "maplibre-gl";
-import type {Coordinate} from "../utils/parseGpx.ts";
+
+import "maplibre-gl/dist/maplibre-gl.css";
+
+import type { Coordinate } from "../utils/parseGpx.ts";
 
 type RouteMapPreviewProps = {
     coordinates: Coordinate[];
     routeColor: string;
+    mapRef: {
+        current: Map | null;
+    };
 };
 
-function RouteMapPreview({
-    coordinates,
-    routeColor,
-}: RouteMapPreviewProps) {
+function RouteMapPreview({coordinates, routeColor, mapRef}: RouteMapPreviewProps) {
     const mapContainerRef =
         useRef<HTMLDivElement | null>(null);
-
-    const mapRef =
-        useRef<Map | null>(null);
 
     /*
      * Initialize MapLibre once.
@@ -35,6 +35,9 @@ function RouteMapPreview({
             style: "https://tiles.openfreemap.org/styles/liberty",
             center: [-121.8863, 37.3382],
             zoom: 10,
+            canvasContextAttributes: {
+                preserveDrawingBuffer: true,
+            },
         });
 
         map.addControl(
@@ -44,6 +47,9 @@ function RouteMapPreview({
 
         mapRef.current = map;
 
+        /*
+         * Cleanup.
+         */
         return () => {
             map.remove();
             mapRef.current = null;
@@ -51,7 +57,7 @@ function RouteMapPreview({
     }, []);
 
     /*
-     * Update the route whenever coordinates
+     * Update route whenever coordinates
      * or route color changes.
      */
     useEffect(() => {
@@ -62,13 +68,24 @@ function RouteMapPreview({
         }
 
         const drawRoute = () => {
-            /*
-             * Remove the route if there are
-             * no coordinates.
-             */
+            // Remove route if there are no coordinates.
+            // Source = the data (i.e. cycling routes)
+            // Layer = how the data is displayed (i.e. line, marker, colors)
             if (coordinates.length === 0) {
+                if (map.getLayer("post-route-start")) {
+                    map.removeLayer("post-route-start");
+                }
+
+                if (map.getSource("post-route-start")) {
+                    map.removeSource("post-route-start");
+                }
+
                 if (map.getLayer("post-route-line")) {
                     map.removeLayer("post-route-line");
+                }
+
+                if (map.getLayer("route-line-outline")) {
+                    map.removeLayer("route-line-outline");
                 }
 
                 if (map.getSource("post-route")) {
@@ -78,66 +95,103 @@ function RouteMapPreview({
                 return;
             }
 
-            /*
-             * MapLibre only needs longitude/latitude.
-             *
-             * Our Coordinate is:
-             *
-             * [longitude, latitude, elevation?]
-             *
-             * so ignore elevation here.
-             */
             const routeCoordinates: [number, number][] =
-                coordinates.map(
-                    (coordinate) => [
-                        coordinate.longitude,
-                        coordinate.latitude,
-                    ]
-                );
+                coordinates.map((coordinate) => [
+                    coordinate.longitude,
+                    coordinate.latitude,
+                ]);
+
+            // Route GeoJSON. (Represents cycling route)
             const geoJson = {
-                type: "Feature" as const,
-                properties: {},
-                geometry: {
-                    type: "LineString" as const,
+                type: "Feature" as const,   // Feature = represents some geographic thing (e.g. point, linestring, polygon)
+                properties: {},  // store extra info about feature if needed
+                geometry: { // geographic shape
+                    type: "LineString" as const,    // LineString = connect coordinates together to form a line
                     coordinates: routeCoordinates,
                 },
             };
 
-            /*
-             * Update existing GeoJSON source.
-             */
-            const existingSource = map.getSource(
-                "post-route"
-            ) as GeoJSONSource | undefined;
+            // Start point GeoJSON.
+            const startPoint = {
+                type: "Feature" as const,
+                properties: {},
+                geometry: {
+                    type: "Point" as const,
+                    coordinates: routeCoordinates[0],   // just use first coordinate as start
+                },
+            };
 
-            if (existingSource) {
-                existingSource.setData(geoJson);
+            // Route source (the geographic
+            const existingRouteSource = map.getSource("post-route") as | GeoJSONSource | undefined;
+
+            if (existingRouteSource) {
+                // Update existing source
+                existingRouteSource.setData(geoJson);
             } else {
-                /*
-                 * Create source.
-                 */
+                // No source yet, create one
                 map.addSource("post-route", {
                     type: "geojson",
                     data: geoJson,
                 });
 
-                /*
-                 * Create route line.
-                 */
+                // White route outline.
+                map.addLayer({
+                    id: "route-line-outline",
+                    type: "line",
+                    source: "post-route",   // take data from post-route and draw it as a line
+                    layout: {
+                        "line-join": "round",
+                        "line-cap": "round",
+                    },
+                    paint: {
+                        "line-color": "#ffffff",
+                        "line-width": 10,
+                        "line-opacity": 0.9,
+                    },
+                });
+
+                // Colored route line.
                 map.addLayer({
                     id: "post-route-line",
                     type: "line",
                     source: "post-route",
-                    paint: {
+                    layout: {
+                        "line-join": "round",
+                        "line-cap": "round",
+                    },
+                    paint: {    // inital color
                         "line-color": routeColor,
                         "line-width": 5,
                     },
                 });
             }
 
-            /*
-             * Update color.
-             */
+            // Start point source
+            const existingStartSource = map.getSource("post-route-start") as | GeoJSONSource | undefined;
+
+            if (existingStartSource) {
+                existingStartSource.setData(startPoint);
+            } else {
+                map.addSource("post-route-start", {
+                    type: "geojson",
+                    data: startPoint,
+                });
+
+                // Start marker.
+                map.addLayer({
+                    id: "post-route-start",
+                    type: "circle",
+                    source: "post-route-start",
+                    paint: {
+                        "circle-radius": 10,
+                        "circle-color": routeColor,
+                        "circle-stroke-color": "#ffffff",
+                        "circle-stroke-width": 3,
+                    },
+                });
+            }
+
+            // Update existing layer if user changes route color
             if (map.getLayer("post-route-line")) {
                 map.setPaintProperty(
                     "post-route-line",
@@ -146,16 +200,20 @@ function RouteMapPreview({
                 );
             }
 
-            /*
-             * Zoom map to the route.
-             */
+            if (map.getLayer("post-route-start")) {
+                map.setPaintProperty(
+                    "post-route-start",
+                    "circle-color",
+                    routeColor
+                );
+            }
+
+            // Fit map to route
             const bounds = new LngLatBounds();
 
-            routeCoordinates.forEach(
-                (coordinate) => {
-                    bounds.extend(coordinate);
-                }
-            );
+            routeCoordinates.forEach((coordinate) => {
+                bounds.extend(coordinate);
+            });
 
             map.fitBounds(bounds, {
                 padding: 50,
@@ -163,19 +221,15 @@ function RouteMapPreview({
             });
         };
 
-        /*
-         * Map style may not be loaded yet.
-         */
+        // Wait until the map style is loaded.
         if (map.isStyleLoaded()) {
             drawRoute();
         } else {
+            // load = When map finishes loading
             map.once("load", drawRoute);
         }
 
-        /*
-         * Clean up the event listener if
-         * this effect runs again.
-         */
+        // Remove load listener if effect runs again.
         return () => {
             map.off("load", drawRoute);
         };

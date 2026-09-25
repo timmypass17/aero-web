@@ -19,6 +19,8 @@ public class CreatePostRequest {
 
     private String routeColor;
 
+    private MultipartFile routeThumbnail;
+
     public CreatePostRequest() {
     }
 
@@ -68,5 +70,13 @@ public class CreatePostRequest {
 
     public void setRouteColor(String routeColor) {
         this.routeColor = routeColor;
+    }
+
+    public MultipartFile getRouteThumbnail() {
+        return routeThumbnail;
+    }
+
+    public void setRouteThumbnail(MultipartFile routeThumbnail) {
+        this.routeThumbnail = routeThumbnail;
     }
 }

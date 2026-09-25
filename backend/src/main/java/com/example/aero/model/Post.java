@@ -16,6 +16,8 @@ public class Post {
 
     /*
      * The user who created the post.
+     * - FetchType.LAZY = wait to load user until you actually use it (post.getUser())
+     * - optional = false means this relationship is required
      */
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
@@ -48,19 +50,20 @@ public class Post {
 
     /*
      * Original GPX file.
-     *
+     * - Allow users to download original GPX file
+     * - Fine to store in Postgres because file is generally small (~100kb)
      * NULL when the user selected an existing route.
      */
     @Column(
             name = "gpx_data",
-            columnDefinition = "bytea"
+            columnDefinition = "bytea" // Define its PostgreSQL type as bytea
     )
     private byte[] gpxData;
 
     /*
      * Snapshot of the route geometry at the time
      * the post was created.
-     *
+     * - Required to perform geospatial queries
      * PostGIS:
      * geography(LineString, 4326)
      */
@@ -71,8 +74,7 @@ public class Post {
     private LineString routeGeometry;
 
     /*
-     * Color selected for displaying the route
-     * on the post.
+     * Color selected for displaying the route on the post.
      */
     @Column(
             name = "route_color",
@@ -110,6 +112,9 @@ public class Post {
      */
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
+
+    @Column(name = "route_thumbnail_key")
+    private String routeThumbnailKey;
 
     public Post() {
     }
@@ -216,5 +221,13 @@ public class Post {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public String getRouteThumbnailKey() {
+        return routeThumbnailKey;
+    }
+
+    public void setRouteThumbnailKey(String routeThumbnailKey) {
+        this.routeThumbnailKey = routeThumbnailKey;
     }
 }

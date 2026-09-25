@@ -27,19 +27,22 @@ public class PostService {
     private final CyclingRouteRepository cyclingRouteRepository;
     private final GpxParserService gpxParserService;
     private final GeometryFactory geometryFactory;
+    private final S3Service s3Service;
 
     public PostService(
             PostRepository postRepository,
             CyclingRouteRepository cyclingRouteRepository,
             UserRepository userRepository,
             GpxParserService gpxParserService,
-            GeometryFactory geometryFactory
+            GeometryFactory geometryFactory,
+            S3Service s3Service
     ) {
         this.postRepository = postRepository;
         this.cyclingRouteRepository = cyclingRouteRepository;
         this.userRepository = userRepository;
         this.gpxParserService = gpxParserService;
         this.geometryFactory = geometryFactory;
+        this.s3Service = s3Service;
     }
 
     @Transactional
@@ -55,6 +58,15 @@ public class PostService {
                         new RuntimeException("User not found")
                 );
 
+        String routeThumbnailKey = null;
+        MultipartFile routeThumbnail = request.getRouteThumbnail();
+        if (routeThumbnail != null && !routeThumbnail.isEmpty()) {
+            routeThumbnailKey = s3Service.uploadThumbnail(
+                    routeThumbnail,
+                    user.getId().toString()
+            );
+        }
+
         Post post = new Post();
 
         post.setUser(user);
@@ -63,6 +75,7 @@ public class PostService {
         post.setEndTime(request.getEndDateTime());
         post.setRouteColor(request.getRouteColor());
         post.setCreatedAt(LocalDateTime.now());
+        post.setRouteThumbnailKey(routeThumbnailKey);
 
         boolean isUsingExistingRoute = request.getRouteId() != null;
         if (isUsingExistingRoute) {

@@ -33,7 +33,7 @@ type Coordinate = [number, number];
 const UPLOADED_ROUTE_ID = "uploadedRouteId";
 const NEARBY_ROUTE_ID = "nearbyRouteId";
 
-function createStartMarkerElement(
+export function createStartMarkerElement(
     color: string
 ) {
     const element = document.createElement("div");
