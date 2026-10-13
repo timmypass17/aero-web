@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import LoginPage from "./pages/LoginPage/LoginPage.tsx";
 import SignupPage from "./pages/SignupPage/SignupPage.tsx";
-import HomePage from "./pages/HomePage.tsx";
+import HomePage from "./pages/HomePage/HomePage.tsx";
 import ProtectedRoute from "./components/ProtectedRoute";
 import MapPage from "./pages/MapPage/MapPage.tsx";
 import AppLayout from "./components/AppLayout.tsx";
@@ -10,30 +10,28 @@ import CreateRoutePage from "./pages/CreateRoutePage/CreateRoutePage.tsx";
 import CreatePostPage from "./pages/CreatePostPage/CreatePostPage.tsx";
 
 function App() {
-    return (
-        <BrowserRouter>
-            <Routes>
+  return (
+    <BrowserRouter>
+      <Routes>
+        {/* Public */}
+        <Route element={<AppLayout />}>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/map" element={<MapPage />} />
+        </Route>
 
-                {/* Public */}
-                <Route element={<AppLayout />}>
-                    <Route path="/" element={<HomePage />} />
-                    <Route path="/map" element={<MapPage />} />
-                </Route>
+        {/* Authentication */}
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<SignupPage />} />
 
-                {/* Authentication */}
-                <Route path="/login" element={<LoginPage />} />
-                <Route path="/signup" element={<SignupPage />} />
-
-                {/* Authenticated */}
-                <Route element={<ProtectedRoute />}>
-                    <Route element={<AppLayout />}>
-                        <Route path="/routes/new" element={<CreateRoutePage/>} />
-                        <Route path="/posts/new" element={<CreatePostPage/>} />
-                    </Route>
-                </Route>
-
-            </Routes>
-        </BrowserRouter>
-    );
+        {/* Authenticated */}
+        <Route element={<ProtectedRoute />}>
+          <Route element={<AppLayout />}>
+            <Route path="/routes/new" element={<CreateRoutePage />} />
+            <Route path="/posts/new" element={<CreatePostPage />} />
+          </Route>
+        </Route>
+      </Routes>
+    </BrowserRouter>
+  );
 }
 export default App;

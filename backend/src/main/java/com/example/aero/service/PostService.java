@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -74,7 +75,7 @@ public class PostService {
         post.setStartTime(request.getStartDateTime());
         post.setEndTime(request.getEndDateTime());
         post.setRouteColor(request.getRouteColor());
-        post.setCreatedAt(LocalDateTime.now());
+        post.setCreatedAt(Instant.now());
         post.setRouteThumbnailKey(routeThumbnailKey);
 
         boolean isUsingExistingRoute = request.getRouteId() != null;

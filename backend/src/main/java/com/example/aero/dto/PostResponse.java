@@ -3,34 +3,27 @@ package com.example.aero.dto;
 import com.example.aero.model.Post;
 
 import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 public class PostResponse {
 
     private UUID id;
-
+    private String firstName;
+    private String lastName;
     private String username;
-
     private String content;
-
+    private String thumbnailUrl;
     private String routeSource;
-
     private UUID routeId;
-
     private String routeColor;
-
     private Double distance;
-
     private Double elevationGain;
-
     private Long durationSeconds;
-
-    private LocalDateTime startTime;
-
-    private LocalDateTime endTime;
-
-    private LocalDateTime createdAt;
+    private Instant startTime;
+    private Instant endTime;
+    private Instant createdAt;
 
     public PostResponse() {
     }
@@ -41,11 +34,18 @@ public class PostResponse {
 
         response.id = post.getId();
 
+        // TODO: Use actual data
+        response.firstName = "Timmy";
+
+        response.lastName = "Nguyen";
+
         response.username =
                 post.getUser().getUsername();
 
         response.content =
                 post.getContent();
+
+        response.thumbnailUrl = "thumbnail.jpg";
 
         response.routeSource =
                 post.getRouteSource().name();
@@ -86,12 +86,24 @@ public class PostResponse {
         return id;
     }
 
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
     public String getUsername() {
         return username;
     }
 
     public String getContent() {
         return content;
+    }
+
+    public String getThumbnailUrl() {
+        return thumbnailUrl;
     }
 
     public String getRouteSource() {
@@ -118,15 +130,15 @@ public class PostResponse {
         return durationSeconds;
     }
 
-    public LocalDateTime getStartTime() {
+    public Instant getStartTime() {
         return startTime;
     }
 
-    public LocalDateTime getEndTime() {
+    public Instant getEndTime() {
         return endTime;
     }
 
-    public LocalDateTime getCreatedAt() {
+    public Instant getCreatedAt() {
         return createdAt;
     }
 }

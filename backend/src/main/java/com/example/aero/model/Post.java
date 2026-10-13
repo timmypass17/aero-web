@@ -3,7 +3,7 @@ package com.example.aero.model;
 import jakarta.persistence.*;
 import org.locationtech.jts.geom.LineString;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.UUID;
 
 @Entity
@@ -99,19 +99,19 @@ public class Post {
      * When the ride started.
      */
     @Column(name = "start_time", nullable = false)
-    private LocalDateTime startTime;
+    private Instant startTime;
 
     /*
      * When the ride ended.
      */
     @Column(name = "end_time", nullable = false)
-    private LocalDateTime endTime;
+    private Instant endTime;
 
     /*
      * When this post was created.
      */
     @Column(name = "created_at", nullable = false)
-    private LocalDateTime createdAt;
+    private Instant createdAt;
 
     @Column(name = "route_thumbnail_key")
     private String routeThumbnailKey;
@@ -199,27 +199,27 @@ public class Post {
         this.elevationGain = elevationGain;
     }
 
-    public LocalDateTime getStartTime() {
+    public Instant getStartTime() {
         return startTime;
     }
 
-    public void setStartTime(LocalDateTime startTime) {
+    public void setStartTime(Instant startTime) {
         this.startTime = startTime;
     }
 
-    public LocalDateTime getEndTime() {
+    public Instant getEndTime() {
         return endTime;
     }
 
-    public void setEndTime(LocalDateTime endTime) {
+    public void setEndTime(Instant endTime) {
         this.endTime = endTime;
     }
 
-    public LocalDateTime getCreatedAt() {
+    public Instant getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
+    public void setCreatedAt(Instant createdAt) {
         this.createdAt = createdAt;
     }
 

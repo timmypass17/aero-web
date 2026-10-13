@@ -2,7 +2,7 @@ package com.example.aero.dto;
 
 import org.springframework.web.multipart.MultipartFile;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.UUID;
 
 public class CreatePostRequest {
@@ -13,9 +13,9 @@ public class CreatePostRequest {
 
     private MultipartFile gpxFile;
 
-    private LocalDateTime startDateTime;
+    private Instant startDateTime;
 
-    private LocalDateTime endDateTime;
+    private Instant endDateTime;
 
     private String routeColor;
 
@@ -48,19 +48,19 @@ public class CreatePostRequest {
         this.gpxFile = gpxFile;
     }
 
-    public LocalDateTime getStartDateTime() {
+    public Instant getStartDateTime() {
         return startDateTime;
     }
 
-    public void setStartDateTime(LocalDateTime startDateTime) {
+    public void setStartDateTime(Instant startDateTime) {
         this.startDateTime = startDateTime;
     }
 
-    public LocalDateTime getEndDateTime() {
+    public Instant getEndDateTime() {
         return endDateTime;
     }
 
-    public void setEndDateTime(LocalDateTime endDateTime) {
+    public void setEndDateTime(Instant endDateTime) {
         this.endDateTime = endDateTime;
     }
 
