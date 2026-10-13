@@ -74,12 +74,20 @@ li {
   color: #111827;
 }
 
-.post-image-placeholder {
+.post-image-container {
   width: 100%;
   aspect-ratio: 16 / 9;
   background-color: #e5e7eb;
   border-radius: 12px;
   margin-top: 0.75rem;
+  overflow: hidden; /* clips child elements */
+}
+
+.post-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
 .post-activity-stats {

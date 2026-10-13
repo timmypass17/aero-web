@@ -91,6 +91,12 @@ public class SecurityConfig {
                             "/routes"
                     ).permitAll()
 
+                    // Anyone can fetch posts
+                    .requestMatchers(
+                            HttpMethod.GET,
+                            "/posts"
+                    ).permitAll()
+
                     // Anyone can log out.
                     .requestMatchers(
                             "/auth/logout"

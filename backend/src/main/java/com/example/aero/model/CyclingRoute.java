@@ -23,7 +23,7 @@ public class CyclingRoute {
     private String description;
 
     @Column(name = "distance")
-    private Double distance;
+    private Double distance;    // meters
 
     @Column(name = "duration")
     private Long duration; // duration in seconds

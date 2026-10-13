@@ -1,6 +1,7 @@
 package com.example.aero.service;
 
 import com.example.aero.dto.CreatePostRequest;
+import com.example.aero.dto.GetPostResponse;
 import com.example.aero.model.CyclingRoute;
 import com.example.aero.model.Post;
 import com.example.aero.model.RouteSource;
@@ -16,8 +17,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -86,6 +89,62 @@ public class PostService {
         }
 
         return postRepository.save(post);
+    }
+
+    public List<GetPostResponse> getPosts() {
+        return postRepository.findAllWithUserNewestFirst()
+                .stream()
+                .map(this::toResponse)  // map Post to GetPostResponse
+                .toList();
+    }
+
+    private GetPostResponse toResponse(Post post) {
+        User user = post.getUser();
+
+        GetPostResponse response = new GetPostResponse();
+
+        response.setId(post.getId());
+        response.setFirstName(user.getFirstName());
+        response.setLastName(user.getLastName());
+        response.setUsername(user.getUsername());
+
+        response.setProfilePictureUrl(
+                user.getPfpKey() == null
+                        ? null
+                        : s3Service.generatePresignedUrl(user.getPfpKey())
+        );
+
+        response.setContent(post.getContent());
+
+        response.setThumbnailUrl(
+                post.getRouteThumbnailKey() == null
+                        ? null
+                        : s3Service.generatePresignedUrl(post.getRouteThumbnailKey())
+        );
+
+
+        response.setRouteId(post.getRoute() != null ? post.getRoute().getId() : null);
+        response.setRouteColor(post.getRouteColor());
+        response.setRouteSource(post.getRouteSource().name());
+        response.setDistance(post.getDistance());
+        response.setElevationGain(post.getElevationGain());
+
+        Long durationSeconds = null;
+
+        if (post.getStartTime() != null && post.getEndTime() != null) {
+            durationSeconds = Duration.between(
+                    post.getStartTime(),
+                    post.getEndTime()
+            ).getSeconds();
+        }
+
+        response.setDurationSeconds(durationSeconds);
+
+        response.setStartTime(post.getStartTime());
+        response.setEndTime(post.getEndTime());
+        response.setCreatedAt(post.getCreatedAt());
+
+        return response;
     }
 
     private void createFromExistingRoute(

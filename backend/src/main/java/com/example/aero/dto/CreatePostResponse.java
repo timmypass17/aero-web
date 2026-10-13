@@ -4,10 +4,9 @@ import com.example.aero.model.Post;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.UUID;
 
-public class PostResponse {
+public class CreatePostResponse {
 
     private UUID id;
     private String firstName;
@@ -25,19 +24,18 @@ public class PostResponse {
     private Instant endTime;
     private Instant createdAt;
 
-    public PostResponse() {
+    public CreatePostResponse() {
     }
 
-    public static PostResponse fromEntity(Post post) {
+    public static CreatePostResponse fromEntity(Post post) {
 
-        PostResponse response = new PostResponse();
+        CreatePostResponse response = new CreatePostResponse();
 
         response.id = post.getId();
 
-        // TODO: Use actual data
-        response.firstName = "Timmy";
+        response.firstName = post.getUser().getFirstName();
 
-        response.lastName = "Nguyen";
+        response.lastName = post.getUser().getLastName();
 
         response.username =
                 post.getUser().getUsername();

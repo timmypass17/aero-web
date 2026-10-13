@@ -4,12 +4,17 @@ import { useState } from "react";
 
 interface PostResponse {
   id: string;
+
   firstName: string;
   lastName: string;
   username: string;
-  content: string;
+  profilePictureUrl: string | null;
 
+  content: string;
   thumbnailUrl: string | null;
+  likesCount: number;
+  commentsCount: number;
+  likedByCurrentUser: boolean;
 
   routeSource: string | null;
   routeId: string | null;
@@ -23,7 +28,6 @@ interface PostResponse {
   endTime: string | null;
   createdAt: string;
 }
-
 interface PostProps {
   post: PostResponse;
 }
@@ -36,7 +40,11 @@ function Post({ post }: PostProps) {
   return (
     <li>
       <header className="post-header">
-        <img src={defaultPfp} alt="Profile picture" className="author-pfp" />
+        <img
+          src={post.profilePictureUrl ?? defaultPfp}
+          alt="Profile picture"
+          className="author-pfp"
+        />
 
         <div className="post-header-content">
           <div className="author-info">
@@ -65,14 +73,24 @@ function Post({ post }: PostProps) {
         <div className="post-stat">
           <span className="post-stat-label">Distance</span>
           <span className="post-stat-value">
-            {post.distance != null ? `${post.distance} km` : "—"}
+            <span className="post-stat-value">
+              {post.distance != null
+                ? `${(post.distance / 1000).toLocaleString(undefined, {
+                    maximumFractionDigits: 2,
+                  })} km`
+                : "—"}
+            </span>{" "}
           </span>
         </div>
 
         <div className="post-stat">
           <span className="post-stat-label">Elevation</span>
           <span className="post-stat-value">
-            {post.elevationGain != null ? `${post.elevationGain} m` : "—"}
+            {post.elevationGain != null
+              ? `${post.elevationGain.toLocaleString(undefined, {
+                  maximumFractionDigits: 2,
+                })} m`
+              : "—"}
           </span>
         </div>
 
@@ -83,7 +101,17 @@ function Post({ post }: PostProps) {
           </span>
         </div>
       </div>
-      <div className="post-image-placeholder" />
+
+      <div className="post-image-container">
+        {post.thumbnailUrl && (
+          <img
+            src={post.thumbnailUrl}
+            alt="Post image"
+            className="post-image"
+          />
+        )}
+      </div>
+
       <div className="post-actions">
         <button
           type="button"
