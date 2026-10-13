@@ -1,0 +1,11 @@
+.home-page-container {
+  width: 100%;
+  max-width: 640px;
+  margin-inline: auto;
+  padding: 1rem;
+  box-sizing: border-box;
+
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}

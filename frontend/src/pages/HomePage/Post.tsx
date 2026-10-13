@@ -1,3 +1,7 @@
+import "./Post.css";
+import defaultPfp from "../../assets/default-pfp.png";
+import { useState } from "react";
+
 interface PostResponse {
   id: string;
   firstName: string;
@@ -25,22 +29,142 @@ interface PostProps {
 }
 
 function Post({ post }: PostProps) {
+  const [liked, setLiked] = useState(false);
+  const [showComments, setShowComments] = useState(false);
+  const [comments, setComments] = useState<string[]>([]);
+  const [commentDraft, setCommentDraft] = useState("");
   return (
     <li>
-      <p>
-        <div>
-          {post.firstName} {post.lastName}
+      <header className="post-header">
+        <img src={defaultPfp} alt="Profile picture" className="author-pfp" />
+
+        <div className="post-header-content">
+          <div className="author-info">
+            <p className="author-name">
+              {post.firstName} {post.lastName}
+            </p>
+            <p className="author-username">@{post.username}</p>
+          </div>
+
+          <time className="post-created-date" dateTime={post.createdAt}>
+            {formatPostDate(post.createdAt)}
+          </time>
         </div>
-        <div>Today at </div>
-      </p>
+
+        <button
+          type="button"
+          className="post-menu-button"
+          aria-label="Post options"
+          onClick={() => console.log("Open post menu")}
+        >
+          ⋯
+        </button>
+      </header>
+      <p>{post.content}</p>
+      <div className="post-activity-stats">
+        <div className="post-stat">
+          <span className="post-stat-label">Distance</span>
+          <span className="post-stat-value">
+            {post.distance != null ? `${post.distance} km` : "—"}
+          </span>
+        </div>
+
+        <div className="post-stat">
+          <span className="post-stat-label">Elevation</span>
+          <span className="post-stat-value">
+            {post.elevationGain != null ? `${post.elevationGain} m` : "—"}
+          </span>
+        </div>
+
+        <div className="post-stat">
+          <span className="post-stat-label">Duration</span>
+          <span className="post-stat-value">
+            {formatDuration(post.durationSeconds)}
+          </span>
+        </div>
+      </div>
+      <div className="post-image-placeholder" />
+      <div className="post-actions">
+        <button
+          type="button"
+          className="post-action comment-action"
+          aria-label={`${comments.length} comments`}
+          aria-expanded={showComments}
+          onClick={() => setShowComments((current) => !current)}
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.4 8.4 0 0 1 3.8-.9h.5a8.5 8.5 0 0 1 8 8v.5Z"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.7"
+              strokeLinejoin="round"
+            />
+          </svg>
+          <span>{comments.length}</span>
+        </button>
+        <button
+          type="button"
+          className={`post-action like-action ${liked ? "is-liked" : ""}`}
+          aria-label={liked ? "Unlike post" : "Like post"}
+          aria-pressed={liked}
+          onClick={() => setLiked((current) => !current)}
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21l7.8-7.5 1.1-1.1a5.5 5.5 0 0 0-.1-7.8Z"
+              fill={liked ? "currentColor" : "none"}
+              stroke="currentColor"
+              strokeWidth="1.7"
+              strokeLinejoin="round"
+            />
+          </svg>
+          <span>{liked ? 1 : 0}</span>
+        </button>
+      </div>
+      {showComments && (
+        <div className="post-comments">
+          <form
+            className="comment-form"
+            onSubmit={(event) => {
+              event.preventDefault();
+
+              const text = commentDraft.trim();
+              if (!text) return;
+
+              setComments((current) => [...current, text]);
+              setCommentDraft("");
+            }}
+          >
+            <input
+              type="text"
+              value={commentDraft}
+              onChange={(event) => setCommentDraft(event.target.value)}
+              placeholder="Write a comment..."
+              aria-label="Write a comment"
+            />
+            <button type="submit" disabled={!commentDraft.trim()}>
+              Reply
+            </button>
+          </form>
+
+          {comments.map((comment, index) => (
+            <p className="post-comment" key={index}>
+              {comment}
+            </p>
+          ))}
+        </div>
+      )}
     </li>
   );
 }
 
-export function formatPostCreatedAt(value: string, now = new Date()): string {
-  // Convert "2026-10-13 10:57:45.845098"
-  // to a JavaScript-compatible timestamp with milliseconds.
-  const normalized = value.replace(" ", "T").replace(/(\.\d{3})\d+/, "$1");
+export function formatPostDate(value: string): string {
+  // Normalize SQL-style timestamp to ISO-compatible format.
+  const normalized = value
+    .replace(" ", "T")
+    .replace(/(\.\d{3})\d+/, "$1") // Microseconds -> milliseconds
+    .replace(/([+-]\d{2})$/, "$1:00"); // -07 -> -07:00
 
   const date = new Date(normalized);
 
@@ -48,13 +172,12 @@ export function formatPostCreatedAt(value: string, now = new Date()): string {
     return value;
   }
 
-  const time = date
-    .toLocaleTimeString("en-US", {
-      hour: "numeric",
-      minute: "2-digit",
-      hour12: true,
-    })
-    .replace(/\s(?=[AP]M)/i, "");
+  const now = new Date();
+
+  const time = new Intl.DateTimeFormat("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+  }).format(date);
 
   const isSameDay = (a: Date, b: Date) =>
     a.getFullYear() === b.getFullYear() &&
@@ -72,13 +195,28 @@ export function formatPostCreatedAt(value: string, now = new Date()): string {
     return `Yesterday at ${time}`;
   }
 
-  const dateLabel = date.toLocaleDateString("en-US", {
+  const options: Intl.DateTimeFormatOptions = {
     month: "short",
     day: "numeric",
-    ...(date.getFullYear() !== now.getFullYear() ? { year: "numeric" } : {}),
-  });
+  };
 
-  return `${dateLabel} at ${time}`;
+  if (date.getFullYear() !== now.getFullYear()) {
+    options.year = "numeric";
+  }
+
+  return `${date.toLocaleDateString("en-US", options)} at ${time}`;
+}
+
+function formatDuration(seconds: number | null): string {
+  if (seconds == null) return "—";
+
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+
+  if (hours === 0) return `${minutes} min`;
+  if (minutes === 0) return `${hours} hr`;
+
+  return `${hours} hr ${minutes} min`;
 }
 
 export default Post;

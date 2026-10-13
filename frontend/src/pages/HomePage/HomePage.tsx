@@ -1,6 +1,5 @@
-import { useNavigate } from "react-router-dom";
 import Post, { type PostResponse } from "./Post";
-
+import "./HomePage.css";
 const mockPosts: PostResponse[] = [
   {
     id: "550e8400-e29b-41d4-a716-446655440001",
@@ -17,7 +16,7 @@ const mockPosts: PostResponse[] = [
     durationSeconds: 5400,
     startTime: "2026-10-13T08:00:00",
     endTime: "2026-10-13T09:30:00",
-    createdAt: "2026-10-13T10:00:00",
+    createdAt: "2026-10-13 12:22:04.42169-07",
   },
   {
     id: "550e8400-e29b-41d4-a716-446655440003",
@@ -34,16 +33,16 @@ const mockPosts: PostResponse[] = [
     durationSeconds: null,
     startTime: null,
     endTime: null,
-    createdAt: "2026-10-12T15:30:00",
+    createdAt: "2026-10-13 12:22:04.42169-07",
   },
 ];
 
 function HomePage() {
   const posts = mockPosts.map((post) => {
-    return <Post post={post} />;
+    return <Post key={post.id} post={post} />;
   });
 
-  return <div>{posts}</div>;
+  return <ol className="home-page-container">{posts}</ol>;
 }
 
 export default HomePage;
