@@ -18,6 +18,8 @@ import org.springframework.security.web.authentication.logout.SecurityContextLog
 import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
@@ -35,11 +37,15 @@ public class AuthController {
         this.securityContextRepository = securityContextRepository;
     }
 
+    // Use @ModelAtribute instead of @RequestBody because request contains multipart form data (e.g. binary file like images)
     @PostMapping("/signup")
-    public ResponseEntity<User> signup(@RequestBody SignupRequest request) {
+    public ResponseEntity<User> signup(@ModelAttribute SignupRequest request) throws IOException {
         User user = authService.signup(
+                request.getFirstName(),
+                request.getLastName(),
                 request.getUsername(),
-                request.getPassword()
+                request.getPassword(),
+                request.getProfilePicture()
         );
         return ResponseEntity.ok(user);
     }

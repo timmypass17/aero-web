@@ -62,9 +62,9 @@ public class PostService {
         String routeThumbnailKey = null;
         MultipartFile routeThumbnail = request.getRouteThumbnail();
         if (routeThumbnail != null && !routeThumbnail.isEmpty()) {
-            routeThumbnailKey = s3Service.uploadThumbnail(
+            routeThumbnailKey = s3Service.uploadFile(
                     routeThumbnail,
-                    user.getId().toString()
+                    "route-thumbnails/" + user.getId().toString()
             );
         }
 

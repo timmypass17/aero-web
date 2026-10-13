@@ -64,9 +64,9 @@ public class CyclingRouteService {
         String thumbnailKey = null;
 
         if (thumbnail != null && !thumbnail.isEmpty()) {
-            thumbnailKey = s3Service.uploadThumbnail(
+            thumbnailKey = s3Service.uploadFile(
                     thumbnail,
-                    user.getId().toString()
+                    "route-thumbnails/" + user.getId().toString()
             );
         }
 

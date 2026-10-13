@@ -14,9 +14,15 @@ public class User {
     @GeneratedValue
     private UUID id;
 
+    private String firstName;
+
+    private String lastName;
+
     private String username;
 
     private String password;
+
+    private String pfpKey;
 
     public User(UUID id, String username, String password) {
         this.id = id;
@@ -46,5 +52,29 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public String getPfpKey() {
+        return pfpKey;
+    }
+
+    public void setPfpKey(String pfpKey) {
+        this.pfpKey = pfpKey;
     }
 }

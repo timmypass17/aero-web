@@ -29,38 +29,39 @@ public class S3Service {
         this.presigner = presigner;
     }
 
-    public String uploadThumbnail(
-            MultipartFile thumbnail,
-            String userId
+    public String uploadFile(
+            MultipartFile file,
+            String keyPrefix
     ) throws IOException {
 
-        String extension = "";
-
-        if (thumbnail.getOriginalFilename() != null) {
-            extension = thumbnail.getOriginalFilename()
-                    .substring(thumbnail.getOriginalFilename().lastIndexOf("."));
+        if (file == null || file.isEmpty()) {
+            throw new IllegalArgumentException("File must not be empty");
         }
 
-        String key =
-                "route-thumbnails/"
-                        + userId
-                        + "/"
-                        + UUID.randomUUID()
-                        + extension;
+        // S3 uses prefixes to organize objects into logical folders.
+        String prefix = keyPrefix.replaceAll("^/+|/+$", "");
+        String key = prefix + "/" + UUID.randomUUID();
+
+        String contentType = file.getContentType();
+        if (contentType == null) {
+            contentType = "application/octet-stream";
+        }
 
         PutObjectRequest request = PutObjectRequest.builder()
                 .bucket(bucketName)
                 .key(key)
-                .contentType(thumbnail.getContentType())
+                .contentType(contentType)
                 .build();
 
-        s3Client.putObject(
-                request,
-                RequestBody.fromInputStream(
-                        thumbnail.getInputStream(),
-                        thumbnail.getSize()
-                )
-        );
+        try (var inputStream = file.getInputStream()) {
+            s3Client.putObject(
+                    request,
+                    RequestBody.fromInputStream(
+                            inputStream,
+                            file.getSize()
+                    )
+            );
+        }
 
         return key;
     }
