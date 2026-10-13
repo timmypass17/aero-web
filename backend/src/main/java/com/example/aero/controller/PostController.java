@@ -5,6 +5,10 @@ import com.example.aero.dto.CreatePostResponse;
 import com.example.aero.dto.GetPostResponse;
 import com.example.aero.model.Post;
 import com.example.aero.service.PostService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -39,7 +43,13 @@ public class PostController {
     }
 
     @GetMapping
-    public ResponseEntity<List<GetPostResponse>> getPosts() {
-        return ResponseEntity.ok(postService.getPosts());
+    public ResponseEntity<Page<GetPostResponse>> getPosts(
+            @PageableDefault(
+                    size = 20,
+                    sort = "createdAt",
+                    direction = Sort.Direction.DESC
+            ) Pageable pageable) {
+
+        return ResponseEntity.ok(postService.getPosts(pageable));
     }
 }

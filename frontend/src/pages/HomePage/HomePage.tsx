@@ -1,4 +1,4 @@
-import Post, { type PostResponse } from "./Post";
+import Post, { type PageResponse, type PostResponse } from "./Post";
 import "./HomePage.css";
 import { useEffect, useState } from "react";
 
@@ -8,16 +8,20 @@ function HomePage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    async function fetchPosts() {
+    async function fetchPosts(page: number) {
       try {
-        const response = await fetch("http://localhost:8080/posts");
+        const params = new URLSearchParams({
+          page: String(page),
+          size: "20",
+        });
 
+        const response = await fetch(`http://localhost:8080/posts?${params}`);
         if (!response.ok) {
           throw new Error(`HTTP error: ${response.status}`);
         }
 
-        const data: PostResponse[] = await response.json();
-        setPosts(data);
+        const data: PageResponse<PostResponse> = await response.json();
+        setPosts(data.content);
       } catch (err) {
         if (err instanceof Error) {
           setError(err.message);
@@ -29,7 +33,7 @@ function HomePage() {
       }
     }
 
-    fetchPosts();
+    fetchPosts(0);
   }, []);
 
   if (loading) {

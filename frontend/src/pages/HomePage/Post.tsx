@@ -28,6 +28,18 @@ interface PostResponse {
   endTime: string | null;
   createdAt: string;
 }
+
+interface PageResponse<T> {
+  content: T[]; // Actual data
+  totalElements: number; // Total number of posts across all pages.
+  totalPages: number; // Total number of pages available.
+  number: number; // The current page number, starting at 0.
+  size: number; // Maximum number of posts requested per page.
+  numberOfElements: number; // Number of posts actually returned on this page.
+  first: boolean;
+  last: boolean;
+}
+
 interface PostProps {
   post: PostResponse;
 }
@@ -248,4 +260,4 @@ function formatDuration(seconds: number | null): string {
 }
 
 export default Post;
-export type { PostResponse };
+export type { PostResponse, PageResponse };

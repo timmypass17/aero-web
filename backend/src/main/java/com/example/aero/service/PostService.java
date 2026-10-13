@@ -13,6 +13,8 @@ import jakarta.transaction.Transactional;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -91,11 +93,9 @@ public class PostService {
         return postRepository.save(post);
     }
 
-    public List<GetPostResponse> getPosts() {
-        return postRepository.findAllWithUserNewestFirst()
-                .stream()
-                .map(this::toResponse)  // map Post to GetPostResponse
-                .toList();
+    public Page<GetPostResponse> getPosts(Pageable pageable) {
+        return postRepository.findAllWithUser(pageable)
+                .map(this::toResponse);
     }
 
     private GetPostResponse toResponse(Post post) {
